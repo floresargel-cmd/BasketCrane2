@@ -78,14 +78,28 @@ inline bool basketUiPreview(const QString& file, const QString& mode) {
             << (QVector<QVariant>()<<700.2<<81<<"from 1300.0"<<"2026-10-06 14:48:02");
         recoverControllerBasketNumbers(events,audits);
         if (events[0][0].toString()!="Move basket #52 from 1111 to 1300"
-            || events[1][0].toString()!="Move basket from 1300 to 702"
+            || events[1][0].toString()!="Move basket #81 from 1300 to 702"
             || events[2][0].toString()!="Move basket #93 from 1111 to 1300"
             || events[3][0].toString()!="Plc step:6") return false;
         events[0]=movement("Move basket from 1111 to 1300");
         audits << (QVector<QVariant>()<<1300.0<<93<<"from 1110.1"<<time);
         recoverControllerBasketNumbers(events,audits);
         if (events[0][0].toString()!="Move basket from 1111 to 1300") return false;
-        std::puts("PASS: legacy movement history recovers basket IDs only from exact, unambiguous position audit matches.");
+        QVector<QVector<QVariant>> delayed;
+        delayed << (QVector<QVariant>()<<"Move basket from 1300 to 1111"<<"Moving basket"<<"info"<<"2026/10/06 15:00:18");
+        QVector<QVector<QVariant>> actualAudit;
+        actualAudit << (QVector<QVariant>()<<"1110.1    "<<110<<"from 1300.0    "<<"2026/10/06 15:00:20 ");
+        recoverControllerBasketNumbers(delayed,actualAudit);
+        if (delayed[0][0].toString()!="Move basket #110 from 1300 to 1111") return false;
+        delayed[0][0]="Move basket from 1300 to 1111";
+        actualAudit[0][3]="2026/10/06 15:00:17";
+        recoverControllerBasketNumbers(delayed,actualAudit);
+        if (delayed[0][0].toString()!="Move basket from 1300 to 1111") return false;
+        actualAudit[0][3]="2026/10/06 15:00:24";
+        recoverControllerBasketNumbers(delayed,actualAudit);
+        if (delayed[0][0].toString()!="Move basket from 1300 to 1111") return false;
+        std::puts("PASS: actual controller/audit timestamp delay recovers basket #110; earlier and out-of-window audits are excluded.");
+        std::puts("PASS: legacy movement history recovers basket IDs from delayed, unambiguous position audit matches.");
     }
     BasketPreviewQueueDriver *fixtureDriver = new BasketPreviewQueueDriver;
     QSqlDatabase::addDatabase(fixtureDriver,bDb);

@@ -23,13 +23,14 @@ public:
     int Run(int argc, char* argv[])
     {
         // Validation mode uses QtCore only and never constructs the HMI.
-        bool checkOnly = false; bool checkSafety = false; bool checkDatabases=false;
+        bool checkOnly = false; bool checkSafety = false; bool checkDatabases=false; bool checkHistory=false;
         for (int i = 1; i < argc; ++i) {
             if (QString::fromLocal8Bit(argv[i]) == "--check-config") checkOnly = true;
             if (QString::fromLocal8Bit(argv[i]) == "--check-safety") checkSafety = true;
             if (QString::fromLocal8Bit(argv[i]) == "--check-databases") checkDatabases=true;
+            if (QString::fromLocal8Bit(argv[i]) == "--check-history") checkHistory=true;
         }
-        QScopedPointer<QCoreApplication> app((checkOnly || checkSafety || checkDatabases)
+        QScopedPointer<QCoreApplication> app((checkOnly || checkSafety || checkDatabases || checkHistory)
             ? new QCoreApplication(argc, argv)
             : new QApplication(argc, argv));
         QCoreApplication::setApplicationName("BasketCrane2");
@@ -44,13 +45,14 @@ public:
         parser.addOption(QCommandLineOption("check-config", "Validate INI settings without connecting to plant systems"));
         parser.addOption(QCommandLineOption("check-safety", "Run offline environment safety regression tests"));
         parser.addOption(QCommandLineOption("check-databases", "Test direct SQL Server connections using SELECT only; no HMI or PLC connections"));
+        parser.addOption(QCommandLineOption("check-history", "Read controller movement history with basket audit recovery; no HMI or PLC connections"));
         QCommandLineOption previewOption("preview-ui", "Save an offline UI preview without plant connections", "png-path");
         parser.addOption(previewOption);
         parser.process(*app);
         if (checkSafety) return basketEnvironmentSafetyTests() && basketNativeSqlServerTests() ? 0 : 1;
         QString configError;
         if (!basketCraneConfig().load(parser.value(configOption), configError)) {
-            if (checkOnly || checkDatabases) std::fprintf(stderr, "%s\n", configError.toLocal8Bit().constData());
+            if (checkOnly || checkDatabases || checkHistory) std::fprintf(stderr, "%s\n", configError.toLocal8Bit().constData());
             else QMessageBox::critical(0, "Configuration error", configError);
             return 1;
         }
@@ -84,6 +86,23 @@ public:
                 QSqlDatabase::removeDatabase(name);
             }
             return allConnected?0:1;
+        }
+        if (checkHistory) {
+            // Always use the SELECT-only driver, regardless of configured mode.
+            const QString backendName="history_read_backend";
+            QSqlDatabase backend=QSqlDatabase::addDatabase(new basket::NativeSqlServerDriver(
+                basket::sqlServerConnectionString(basketCraneConfig(),"BasketDatabase"),
+                basketCraneConfig().text("BasketDatabase/Password")),backendName);
+            if (!backend.open()) { std::fprintf(stderr,"History connection failed: %s\n",qPrintable(backend.lastError().text())); return 1; }
+            QSqlDatabase database=QSqlDatabase::addDatabase(new BasketReadOnlyDriver(backend),bDb);
+            if (!database.open()) return 1;
+            const auto history=readCraneControllerHistory(100);
+            for (const auto& event : history) {
+                if (event[0].toString().startsWith("Move basket"))
+                    std::printf("%s\n",qPrintable(controllerHistoryText(event[0].toString(),event[3])));
+            }
+            database.close(); backend.close();
+            return 0;
         }
         QApplication::setStyle("Fusion");
         applyModernCranePalette();

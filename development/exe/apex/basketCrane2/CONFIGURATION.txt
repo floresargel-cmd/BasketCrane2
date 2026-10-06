@@ -190,9 +190,12 @@ Legacy controller movement history
 LiveObserver can display basket IDs for older "Move basket from X to Y" events
 without upgrading or writing to the Live controller. Both crane history panels
 and expanded history dialogs use a SELECT-only position-audit lookup. Recovery
-requires the same recorded timestamp, source PLC ID and destination PLC ID,
+requires matching source/destination PLC IDs and an audit within five seconds
+after the controller event,
 with exactly one distinct nonzero basket ID. Decimal position indices in
 c2logPos are converted to the corresponding PLC IDs. Missing or conflicting
 audits leave the original event unchanged. The display never guesses from the
 basket currently at a position, and stored controller history is not modified.
 The upper panel retains its startup snapshot; restarting refreshes that snapshot.
+Use --check-history --config <ini-path> to verify recovered controller movement
+history through the SELECT-only driver without constructing the HMI or PLCs.
