@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{432686F9-29AA-426A-A266-B70CE8378D8B}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|win32'">
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">
+    <Import Project="..\..\..\5.7.0.static.x32.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|win32'">
+    <Import Project="..\..\..\5.7.0.static.x32.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <!-- Shared Qt properties include ODBC libraries for other applications. -->
+    <wLibs>OPENGL32.LIB;GlU32.Lib;Psapi.lib;Winmm.lib;ws2_32.lib;imm32.lib;shlwapi.lib;Setupapi.lib;version.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;</wLibs>
+  </PropertyGroup>
+  <PropertyGroup><TargetName>apexBasketCrane2</TargetName><TargetName Condition="'$(Configuration)'=='Debug'">apexBasketCrane2D</TargetName></PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <ExecutablePath>$(ExecutablePath)</ExecutablePath>
+    <IncludePath>../../;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|win32'">
+    <ExecutablePath>$(ExecutablePath)</ExecutablePath>
+    <IncludePath>../../;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <LinkErrorReporting>QueueForNextLogin</LinkErrorReporting>
+      <TargetMachine>MachineX86</TargetMachine>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+    <ClCompile>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <Optimization>Disabled</Optimization>
+      <CompileAsWinRT>false</CompileAsWinRT>
+      <WarningLevel>Level3</WarningLevel>
+      <OmitFramePointers>false</OmitFramePointers>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <ErrorReporting>Queue</ErrorReporting>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|win32'">
+    <Link />
+    <ClCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <ExceptionHandling>Sync</ExceptionHandling>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="..\icon\icon.ico" />
+    <None Include="..\basketCrane2.ini" />
+    <None Include="..\CONFIGURATION.txt" />
+    <None Include="..\ARCHITECTURE.txt" />
+    <None Include="..\.editorconfig" />
+    <None Include="..\installer\Package.wxs" />
+    <None Include="..\installer\Build-Installer.ps1" />
+    <None Include="..\installer\Migrate-Configuration.ps1" />
+    <None Include="..\installer\Set-Version.ps1" />
+    <None Include="..\installer\Versioning.ps1" />
+    <None Include="..\installer\README.txt" />
+    <None Include="..\installer\basketCrane2.template.ini" />
+    <None Include="..\tests\versioning.ps1" />
+    <None Include="..\resources\APEX-dark.png" />
+    <None Include="..\tests\configuration.ps1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\icon\script.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\allPos.h.cpp" />
+    <ClCompile Include="..\nativeSqlServer.cpp">
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+    </ClCompile>
+    <ClCompile Include="..\qtSqlDatabaseNoOdbc.cpp">
+      <AdditionalIncludeDirectories>$(ROOTDIR)\libs\#qt\qt.5.7.0.static.x32\qtbase\src\sql\kernel;$(ROOTDIR)\libs\#qt\qt.5.7.0.static.x32\qtbase\include\QtCore\5.7.0;$(ROOTDIR)\libs\#qt\qt.5.7.0.static.x32\qtbase\include\QtCore\5.7.0\QtCore;$(ROOTDIR)\libs\#qt\qt.5.7.0.static.x32\qtbase\include\QtSql\5.7.0;$(ROOTDIR)\libs\#qt\qt.5.7.0.static.x32\qtbase\include\QtSql\5.7.0\QtSql;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\autoWdg.h.cpp" />
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\bCont.h.cpp" />
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\carriage.h.cpp" />
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\carriageW.h.cpp" />
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\conAllPos.h.cpp" />
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\conBtn.h.cpp" />
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\conMove.h.cpp" />
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\conPos.h.cpp" />
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\conPosDlg.h.cpp" />
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\conProxItem.h.cpp" />
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\conPs.h.cpp" />
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\conW.h.cpp" />
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\crane.h.cpp" />
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\craneWdg.h.cpp" />
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\destW.h.cpp" />
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\expWdg.h.cpp" />
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\gItem.h.cpp" />
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\gText.h.cpp" />
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\gView.h.cpp" />
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\hmiB.h.cpp" />
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\hmiDlg.h.cpp" />
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\hmiSett.h.cpp" />
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\mW.h.cpp" />
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\pos.h.cpp" />
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\posDlg.h.cpp" />
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\settingsDlg.h.cpp" />
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\usageDlg.h.cpp" />
+    <ClCompile Include="..\..\Gs.cpp" />
+    <ClCompile Include="..\emailAlerts.cpp" />
+    <ClCompile Include="..\allPos.cpp" />
+    <ClCompile Include="..\autoWdg.cpp" />
+    <ClCompile Include="..\bCont.cpp" />
+    <ClCompile Include="..\conAllPos.cpp" />
+    <ClCompile Include="..\conBtn.cpp" />
+    <ClCompile Include="..\conMove.cpp" />
+    <ClCompile Include="..\conPos.cpp" />
+    <ClCompile Include="..\conPosDlg.cpp" />
+    <ClCompile Include="..\conPs.cpp" />
+    <ClCompile Include="..\conW.cpp" />
+    <ClCompile Include="..\crane.cpp" />
+    <ClCompile Include="..\craneWdg.cpp" />
+    <ClCompile Include="..\carriage.cpp" />
+    <ClCompile Include="..\carriageW.cpp" />
+    <ClCompile Include="..\destW.cpp" />
+    <ClCompile Include="..\expWdg.cpp" />
+    <ClCompile Include="..\Gb2.cpp" />
+    <ClCompile Include="..\gData.cpp" />
+    <ClCompile Include="..\gDataC.cpp" />
+    <ClCompile Include="..\gItem.cpp" />
+    <ClCompile Include="..\gText.cpp" />
+    <ClCompile Include="..\gView.cpp" />
+    <ClCompile Include="..\hmiB.cpp" />
+    <ClCompile Include="..\hmiDlg.cpp" />
+    <ClCompile Include="..\hmiSett.cpp" />
+    <ClCompile Include="..\m.cpp" />
+    <ClCompile Include="..\mW.cpp" />
+    <ClCompile Include="..\pos.cpp" />
+    <ClCompile Include="..\posDlg.cpp" />
+    <ClCompile Include="..\conProxItem.cpp" />
+    <ClCompile Include="..\resources\recources.cpp" />
+    <ClCompile Include="..\settingsDlg.cpp" />
+    <ClCompile Include="..\usageDlg.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\G.h" />
+    <ClInclude Include="..\..\Gs.h" />
+    <ClInclude Include="..\allPos.h" />
+    <ClInclude Include="..\autoWdg.h" />
+    <ClInclude Include="..\bCont.h" />
+    <ClInclude Include="..\conAllPos.h" />
+    <ClInclude Include="..\conBtn.h" />
+    <ClInclude Include="..\conMove.h" />
+    <ClInclude Include="..\conPos.h" />
+    <ClInclude Include="..\conPosDlg.h" />
+    <ClInclude Include="..\conPs.h" />
+    <ClInclude Include="..\conW.h" />
+    <ClInclude Include="..\crane.h" />
+    <ClInclude Include="..\craneWdg.h" />
+    <ClInclude Include="..\carriage.h" />
+    <ClInclude Include="..\carriageW.h" />
+    <ClInclude Include="..\destW.h" />
+    <ClInclude Include="..\expWdg.h" />
+    <ClInclude Include="..\Gb2.h" />
+    <ClInclude Include="..\version.h" />
+    <ClInclude Include="..\application.h" />
+    <ClInclude Include="..\auditLogger.h" />
+    <ClInclude Include="..\databaseInitializer.h" />
+    <ClInclude Include="..\destinationCatalog.h" />
+    <ClInclude Include="..\startupProgress.h" />
+    <ClInclude Include="..\passwordAuthorization.h" />
+    <ClInclude Include="..\sqlTransaction.h" />
+    <ClInclude Include="..\tests\sqlTransactionTests.h" />
+    <ClInclude Include="..\tests\architectureTests.h" />
+    <ClInclude Include="..\emailAlerts.h" />
+    <ClInclude Include="..\fatalErrorHooks.h" />
+    <ClInclude Include="..\emailAlertSettings.h" />
+    <ClInclude Include="..\config.h" />
+    <ClInclude Include="..\observerDisplay.h" />
+    <ClInclude Include="..\modernUi.h" />
+    <ClInclude Include="..\plant3D.h" />
+    <ClInclude Include="..\exportQueues.h" />
+    <ClInclude Include="..\automaticMissions.h" />
+    <ClInclude Include="..\plantAppearance.h" />
+    <ClInclude Include="..\crane1Theme.h" />
+    <ClInclude Include="..\tests\uiPreview.h" />
+    <ClInclude Include="..\observerTelemetry.h" />
+    <ClInclude Include="..\readOnlySql.h" />
+    <ClInclude Include="..\environmentIo.h" />
+    <ClInclude Include="..\tests\environmentSafety.h" />
+    <ClInclude Include="..\gData.h" />
+    <ClInclude Include="..\gDataC.h" />
+    <ClInclude Include="..\gItem.h" />
+    <ClInclude Include="..\gText.h" />
+    <ClInclude Include="..\gView.h" />
+    <ClInclude Include="..\hmiB.h" />
+    <ClInclude Include="..\hmiDlg.h" />
+    <ClInclude Include="..\hmiSett.h" />
+    <ClInclude Include="..\mW.h" />
+    <ClInclude Include="..\pos.h" />
+    <ClInclude Include="..\posDlg.h" />
+    <ClInclude Include="..\conProxItem.h" />
+    <ClInclude Include="..\settingsDlg.h" />
+    <ClInclude Include="..\usageDlg.h" />
+  </ItemGroup>
+  <ItemDefinitionGroup>
+    <Link>
+      <AdditionalDependencies>$(myLibs);$(qtLibs);$(cxImageLibs);$(wLibs)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>odbc32.lib;odbccp32.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+    </Link>
+    <ClCompile>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <SDLCheck>true</SDLCheck>
+      <ForcedIncludeFiles>$(ProjectDir)..\fatalErrorHooks.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <AdditionalIncludeDirectories>$(MSBuildProgramFiles32)\Common Files\System\ado;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(EnterpriseAnalysis)'=='true'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <EnablePREfast>true</EnablePREfast>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <PropertyGroup>
+    <BasketVersionHeader Condition="'$(BasketVersionHeader)'==''">$(ProjectDir)..\version.h</BasketVersionHeader>
+    <DisableFastUpToDateCheck Condition="'$(Configuration)'=='Release'">true</DisableFastUpToDateCheck>
+  </PropertyGroup>
+  <Target Name="IncrementBasketReleaseVersion" BeforeTargets="PrepareForBuild"
+          Condition="'$(Configuration)'=='Release' and '$(SkipBasketVersionIncrement)'!='true' and '$(DesignTimeBuild)'!='true'">
+    <Exec Command="powershell.exe -NoProfile -File &quot;$(ProjectDir)..\installer\Set-Version.ps1&quot; -Next -Header &quot;$(BasketVersionHeader)&quot;" />
+  </Target>
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <Target Name="CopyInitialBasketCraneConfig" AfterTargets="Build"
+          Condition="!Exists('$(TargetDir)basketCrane2.ini')">
+    <Copy SourceFiles="$(ProjectDir)..\basketCrane2.ini" DestinationFolder="$(TargetDir)" />
+  </Target>
+</Project>

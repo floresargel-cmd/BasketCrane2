@@ -1,0 +1,34 @@
+#ifndef BCONT_H
+#define BCONT_H
+
+#include <QtGui>
+#include <QMainWindow>
+#include <QDoubleSpinBox>
+#include <QComboBox>
+#include <QToolButton>
+#include <QTableWidget>
+#include <QHeaderView>
+#include <QInputDialog>
+#include <QVBoxLayout>
+#include <QLabel>
+#include <QPushButton>
+#include "Gb2.h"
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////cassetteContentsClass//////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class basketContentsClass:public QWidget
+{
+	int											basketNum;
+	//
+	QTableWidget						*tableView;
+public:
+	Q_OBJECT
+public:
+	basketContentsClass(QWidget *w);
+	~basketContentsClass();
+	void updateTable(int basketNum_);
+private:
+	void updateTable();
+public slots:
+};
+#endif

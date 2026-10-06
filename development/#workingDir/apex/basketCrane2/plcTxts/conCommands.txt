@@ -1,0 +1,42 @@
+0|0|Command 0.0:Command SRCrane->11.Basket is moving from SRCrane to conveyor 11.
+0|1|Command 0.1:Command SRCrane->13.Basket is moving from SRCrane to conveyor 13.
+3|0|Command  3.0:Command 11->24.Basket is moving from conveyor 11 to conveyor 24.
+3|1|Command  3.1:Command 24->25.Basket is moving from conveyor 24 to conveyor 25.
+3|2|Command  3.2:Command 25->26.Basket is moving from conveyor 25 to conveyor 26.
+3|3|Command  3.3:Command 26->27.Basket is moving from conveyor 26 to conveyor 27.
+3|4|Command  3.4:Command 27->28.Basket is moving from conveyor 27 to conveyor 28.
+3|5|Command  3.5:Command 28->27side.Side moving conveyor is moving to position 27.
+3|6|Command  3.6:Command 28->28side.Side moving conveyor is moving to position 28.
+3|7|Command  3.7:Command 28->29.Basket is moving from conveyor 28 to conveyor 29.
+3|8|Command  3.8:Command 29->30.Basket is moving from conveyor 29 to conveyor 30.
+3|9|Command  3.9:Command 30->31.Basket is moving from conveyor 30 to conveyor 31.
+3|10|Command 3.10:Command 31->32.Basket is moving from conveyor 31 to conveyor 32.
+3|11|Command 3.11:Command 32->12.Basket is moving from conveyor 32 to conveyor 12.
+3|12|Command 3.12:Command 12->SRCrane.Basket is moving from conveyor 12 to conveyor SRCrane.
+3|13|Command 3.13:Command 33->34.Basket is moving from conveyor 33 to conveyor 34.
+3|14|Command 3.14:Command 34->35.Basket is moving from conveyor 34 to conveyor 35.
+3|15|Command 3.15:
+3|16|Command 3.16:
+3|17|Command 3.17:
+3|18|Command 3.18:
+3|19|Command 3.19: 
+3|20|Command 3.20:
+3|21|Command 3.21:
+3|22|Command 3.22:
+3|23|Command 3.23:
+3|24|Command 3.24:
+3|25|Command 3.25:
+3|26|Command 3.26:
+3|27|Command 3.27:
+3|28|Command 3.28:
+3|29|Command 3.29:
+3|30|Command 3.30:
+3|31|Command 3.31:
+
+
+
+
+
+
+
+

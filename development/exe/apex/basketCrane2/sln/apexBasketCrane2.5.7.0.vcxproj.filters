@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="icon">
+      <UniqueIdentifier>{c58d90be-7057-40c9-8096-2148d20c683a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="moc">
+      <UniqueIdentifier>{631a2479-28fb-4e6d-8e1b-fb743d620df3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dxf">
+      <UniqueIdentifier>{b15e636d-dd39-4242-b381-b830a80cfa96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dxf\moc">
+      <UniqueIdentifier>{7968c079-f014-45f3-8654-796c592a0af4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="conveyors">
+      <UniqueIdentifier>{8b9a5c9d-9529-4c15-95bb-dfd1294ba81b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="conveyors\moc">
+      <UniqueIdentifier>{df87fc45-96ac-4c72-a2b7-cd311b291716}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\resources\recources.cpp">
+      <Filter>icon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\emailAlerts.cpp" />
+    <ClCompile Include="..\allPos.cpp" />
+    <ClCompile Include="..\autoWdg.cpp" />
+    <ClCompile Include="..\crane.cpp" />
+    <ClCompile Include="..\craneWdg.cpp" />
+    <ClCompile Include="..\hmiB.cpp" />
+    <ClCompile Include="..\hmiDlg.cpp" />
+    <ClCompile Include="..\hmiSett.cpp" />
+    <ClCompile Include="..\m.cpp" />
+    <ClCompile Include="..\mW.cpp" />
+    <ClCompile Include="..\pos.cpp" />
+    <ClCompile Include="..\posDlg.cpp" />
+    <ClCompile Include="..\settingsDlg.cpp" />
+    <ClCompile Include="..\usageDlg.cpp" />
+    <ClCompile Include="..\gText.cpp">
+      <Filter>dxf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gData.cpp">
+      <Filter>dxf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gDataC.cpp">
+      <Filter>dxf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gItem.cpp">
+      <Filter>dxf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\gView.cpp">
+      <Filter>dxf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Gb2.cpp" />
+    <ClCompile Include="..\carriage.cpp" />
+    <ClCompile Include="..\carriageW.cpp" />
+    <ClCompile Include="..\bCont.cpp" />
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\autoWdg.h.cpp">
+      <Filter>moc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\bCont.h.cpp">
+      <Filter>moc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\carriage.h.cpp">
+      <Filter>moc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\carriageW.h.cpp">
+      <Filter>moc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\crane.h.cpp">
+      <Filter>moc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\craneWdg.h.cpp">
+      <Filter>moc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\hmiB.h.cpp">
+      <Filter>moc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\hmiDlg.h.cpp">
+      <Filter>moc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\hmiSett.h.cpp">
+      <Filter>moc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\mW.h.cpp">
+      <Filter>moc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\pos.h.cpp">
+      <Filter>moc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\posDlg.h.cpp">
+      <Filter>moc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\settingsDlg.h.cpp">
+      <Filter>moc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\usageDlg.h.cpp">
+      <Filter>moc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\allPos.h.cpp">
+      <Filter>moc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\gItem.h.cpp">
+      <Filter>dxf\moc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\gText.h.cpp">
+      <Filter>dxf\moc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\gView.h.cpp">
+      <Filter>dxf\moc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\conProxItem.cpp">
+      <Filter>conveyors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\conAllPos.cpp">
+      <Filter>conveyors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\conBtn.cpp">
+      <Filter>conveyors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\conMove.cpp">
+      <Filter>conveyors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\conPos.cpp">
+      <Filter>conveyors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\conPosDlg.cpp">
+      <Filter>conveyors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\conW.cpp">
+      <Filter>conveyors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\conAllPos.h.cpp">
+      <Filter>conveyors\moc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\conBtn.h.cpp">
+      <Filter>conveyors\moc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\conMove.h.cpp">
+      <Filter>conveyors\moc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\conPos.h.cpp">
+      <Filter>conveyors\moc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\conPosDlg.h.cpp">
+      <Filter>conveyors\moc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\conProxItem.h.cpp">
+      <Filter>conveyors\moc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\conPs.h.cpp">
+      <Filter>conveyors\moc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\conW.h.cpp">
+      <Filter>conveyors\moc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\conPs.cpp">
+      <Filter>conveyors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\expWdg.cpp" />
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\expWdg.h.cpp">
+      <Filter>moc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Gs.cpp" />
+    <ClCompile Include="..\destW.cpp" />
+    <ClCompile Include="..\..\..\..\#moc\apex\basketCrane2\mocFiles.5.1.1\destW.h.cpp">
+      <Filter>moc</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\icon\icon.ico">
+      <Filter>icon</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\icon\script.rc">
+      <Filter>icon</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\usageDlg.h" />
+    <ClInclude Include="..\allPos.h" />
+    <ClInclude Include="..\autoWdg.h" />
+    <ClInclude Include="..\crane.h" />
+    <ClInclude Include="..\craneWdg.h" />
+    <ClInclude Include="..\..\G.h" />
+    <ClInclude Include="..\hmiB.h" />
+    <ClInclude Include="..\hmiDlg.h" />
+    <ClInclude Include="..\hmiSett.h" />
+    <ClInclude Include="..\mW.h" />
+    <ClInclude Include="..\pos.h" />
+    <ClInclude Include="..\posDlg.h" />
+    <ClInclude Include="..\settingsDlg.h" />
+    <ClInclude Include="..\gText.h">
+      <Filter>dxf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gData.h">
+      <Filter>dxf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gDataC.h">
+      <Filter>dxf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gItem.h">
+      <Filter>dxf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\gView.h">
+      <Filter>dxf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Gb2.h" />
+    <ClInclude Include="..\emailAlerts.h" />
+    <ClInclude Include="..\fatalErrorHooks.h" />
+    <ClInclude Include="..\emailAlertSettings.h" />
+    <ClInclude Include="..\config.h" />
+    <ClInclude Include="..\observerDisplay.h" />
+    <ClInclude Include="..\modernUi.h" />
+    <ClInclude Include="..\plant3D.h" />
+    <ClInclude Include="..\exportQueues.h" />
+    <ClInclude Include="..\plantAppearance.h" />
+    <ClInclude Include="..\crane1Theme.h" />
+    <ClInclude Include="..\tests\uiPreview.h" />
+    <ClInclude Include="..\observerTelemetry.h" />
+    <ClInclude Include="..\readOnlySql.h" />
+    <ClInclude Include="..\environmentIo.h" />
+    <ClInclude Include="..\tests\environmentSafety.h" />
+    <ClInclude Include="..\carriage.h" />
+    <ClInclude Include="..\carriageW.h" />
+    <ClInclude Include="..\bCont.h" />
+    <ClInclude Include="..\conProxItem.h">
+      <Filter>conveyors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\conAllPos.h">
+      <Filter>conveyors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\conBtn.h">
+      <Filter>conveyors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\conMove.h">
+      <Filter>conveyors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\conPos.h">
+      <Filter>conveyors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\conPosDlg.h">
+      <Filter>conveyors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\conW.h">
+      <Filter>conveyors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\conPs.h">
+      <Filter>conveyors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\expWdg.h" />
+    <ClInclude Include="..\..\Gs.h" />
+    <ClInclude Include="..\destW.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\basketCrane2.ini" />
+    <None Include="..\CONFIGURATION.txt" />
+    <None Include="..\tests\configuration.ps1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\version.h" />
+    <ClInclude Include="..\application.h" />
+    <ClInclude Include="..\auditLogger.h" />
+    <ClInclude Include="..\databaseInitializer.h" />
+    <ClInclude Include="..\destinationCatalog.h" />
+    <ClInclude Include="..\automaticMissions.h" />
+    <ClInclude Include="..\startupProgress.h" />
+    <ClInclude Include="..\passwordAuthorization.h" />
+    <ClInclude Include="..\sqlTransaction.h" />
+    <ClInclude Include="..\tests\sqlTransactionTests.h" />
+    <ClInclude Include="..\tests\architectureTests.h" />
+  </ItemGroup>
+</Project>

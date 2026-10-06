@@ -1,0 +1,18 @@
+7|6|Step  1:mission active.
+7|11|Step  2:move horizontally to//load position.
+7|12|Step  3:move vertically down to//load position.
+7|13|Step  4:hooks down.
+7|14|Step  5:move vertically up to 0 mm.
+7|15|Step  6:move horizontally to//unload position.
+7|16|Step  7:move vertically down to//unload position.
+7|17|Step  8:hooks up. 
+7|18|Step  9:move vertically up to 0.
+7|19|Step  10:end mission.
+
+
+
+
+
+
+
+

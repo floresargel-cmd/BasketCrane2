@@ -1,0 +1,57 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+  <Package Name="Apex Basket Crane 2" Manufacturer="Apex" Version="$(var.AppVersion)"
+           UpgradeCode="{F30F74DC-F339-4C63-9D88-7A484BF10E5D}" Scope="perMachine" Language="1033">
+    <MajorUpgrade DowngradeErrorMessage="A newer version of Apex Basket Crane 2 is already installed."
+                  Schedule="afterInstallInitialize" />
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+    <Icon Id="AppIcon" SourceFile="$(var.ProjectRoot)\icon\icon.ico" />
+    <Property Id="ARPPRODUCTICON" Value="AppIcon" />
+    <Property Id="SQLSERVERCLIENT">
+      <RegistrySearch Id="SqlServerNativeClient" Root="HKLM" Key="SOFTWARE\Classes\MSOLEDBSQL19\CLSID" Type="raw" Bitness="always32" />
+    </Property>
+    <Launch Condition="Installed OR SQLSERVERCLIENT" Message="Microsoft OLE DB Driver 19 for SQL Server (32-bit client) is required. Install it from Microsoft's SQL Server OLE DB driver download page, then run this installer again. No ODBC driver or DSN is required." />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALTEXT"
+              Value="Configure SQL Server endpoints, catalogs and credentials in C:\ProgramData\Apex\BasketCrane2\basketCrane2.ini before launching. No ODBC driver or DSN is required. The supplied template selects LiveObserver." />
+    <ui:WixUI Id="WixUI_InstallDir" InstallDirectory="INSTALLFOLDER" />
+    <!-- This internal deployment package adds no separate license agreement. -->
+    <UI>
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg" Order="2" Condition="NOT Installed" />
+      <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="2" Condition="1" />
+    </UI>
+    <StandardDirectory Id="ProgramFilesFolder">
+      <Directory Id="ApexProgramFolder" Name="Apex">
+        <Directory Id="INSTALLFOLDER" Name="BasketCrane2">
+          <Component Id="MainApplication" Guid="{6F8D649D-CF67-435E-89ED-A8DA506075CB}">
+            <File Id="MainExecutable" Source="$(var.PayloadDir)\apexBasketCrane2.exe" KeyPath="yes" />
+          </Component>
+        </Directory>
+      </Directory>
+    </StandardDirectory>
+    <StandardDirectory Id="CommonAppDataFolder">
+      <Directory Id="ApexDataFolder" Name="Apex">
+        <Directory Id="CONFIGFOLDER" Name="BasketCrane2">
+          <Component Id="SiteConfiguration" Guid="{4C92A3FA-7BD0-4C4F-9B7D-3EB5D3FB8416}" Permanent="yes" NeverOverwrite="yes">
+            <File Id="ConfigurationFile" Source="$(var.ProjectRoot)\installer\basketCrane2.template.ini" Name="basketCrane2.ini" KeyPath="yes" />
+          </Component>
+        </Directory>
+      </Directory>
+    </StandardDirectory>
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ApplicationMenu" Name="Apex Basket Crane 2">
+        <Component Id="ApplicationShortcuts" Guid="{8E82D26A-BE6C-4B73-87A3-DB78F2085B9F}">
+          <Shortcut Id="StartApplication" Name="Apex Basket Crane 2" Target="[#MainExecutable]"
+                    Arguments="--config &quot;[CONFIGFOLDER]basketCrane2.ini&quot;" WorkingDirectory="INSTALLFOLDER" Icon="AppIcon" />
+          <Shortcut Id="ConfigurationGuide" Name="Configuration guide" Target="[INSTALLFOLDER]CONFIGURATION.txt" WorkingDirectory="INSTALLFOLDER" />
+          <RemoveFolder Id="RemoveApplicationMenu" On="uninstall" />
+          <RegistryValue Root="HKLM" Key="Software\Apex\BasketCrane2" Name="Installed" Type="integer" Value="1" KeyPath="yes" />
+        </Component>
+      </Directory>
+    </StandardDirectory>
+    <Feature Id="Application" Title="Apex Basket Crane 2" Level="1">
+      <ComponentRef Id="MainApplication" />
+      <ComponentRef Id="SiteConfiguration" />
+      <ComponentRef Id="ApplicationShortcuts" />
+      <ComponentGroupRef Id="RuntimePayload" />
+    </Feature>
+  </Package>
+</Wix>

@@ -1,0 +1,40 @@
+0|0|Command  0.0:
+0|1|Command  0.1:Command 1->2.Basket is moving from conveyor BC1 to conveyor BC2.
+0|2|Command  0.2:Command 2->3.Basket is moving from conveyor BC2 to conveyor BC3.
+0|3|Command  0.3:Command 3->8.Basket is moving from conveyor BC3 to conveyor BC8.
+0|4|Command  0.4:
+0|5|Command  0.5:
+0|6|Command  0.6:Command 6->3.Basket is moving from conveyor BC6 to conveyor BC3.
+0|7|Command  0.7:
+0|8|Command  0.8:Command 8->9.Basket is moving from conveyor BC8 to conveyor BC9.
+0|9|Command  0.9:Command 9->4.Basket is moving from conveyor BC9 to conveyor BC4.
+0|10|Command 0.10Command 4->7.Basket is moving from conveyor BC4 to conveyor BC7.
+0|11|Command 0.11:
+0|12|Command 0.12:
+0|13|Command 0.13:Command 2->1.Basket is moving from conveyor BC2 to conveyor BC1.
+0|14|Command 0.14:Command 3->6.Basket is moving from conveyor BC3 to conveyor BC6.
+0|15|Command 0.15:
+0|16|Command 0.16:
+0|17|Command 0.17:Command 3->2.Basket is moving from conveyor BC3 to conveyor BC2.
+0|18|Command 0.18:
+0|19|Command 0.19: 
+0|20|Command 0.20:
+0|21|Command 0.21:
+0|22|Command 0.22:
+0|23|Command 0.23:
+0|24|Command 0.24:
+0|25|Command 0.25:
+0|26|Command 0.26:Rotation to BC2.
+0|27|Command 0.27:Rotation to BC6.
+0|28|Command 0.28:
+0|29|Command 0.29:
+0|30|Command 0.30:
+0|31|Command 0.31:
+
+
+
+
+
+
+
+

@@ -1,0 +1,32 @@
+28|0|Signal to oven 1:Position 661-664 locked.
+28|1|Signal to oven 1:Position 671-674 locked.
+28|2|Signal to oven 1:Position 681-684 locked.
+28|3|Signal to oven 1:Position 691-694 locked.
+28|4|Signal to oven 2:Position 1041-1044 locked.
+28|5|Signal to oven 2:Position 1051-1054 locked.
+28|6|Signal to oven 2:Position 1061-1064 locked.
+28|7|Signal to return conveyor1:Position 701-702 locked.
+28|8|Signal to conveyor 6:Position 1111 locked.
+28|9|Signal to conveyor 7:Position 1101 locked.
+28|10|
+28|11|
+28|12|
+28|13|
+28|14|
+28|15|
+28|16|
+28|17|
+28|18|
+28|19|
+28|20|
+28|21|
+28|22|
+28|23|
+28|24|
+28|25|
+28|26|
+28|27|
+28|28|
+28|29|
+28|30|
+28|31|

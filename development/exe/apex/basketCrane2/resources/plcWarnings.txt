@@ -1,0 +1,32 @@
+46|0|Warning 0.0:Crane can not move X,Y axis fwd-bwd.Axis Z proximity switch is not active.Crane must be up.
+46|1|Warning 0.1:Crane can not move X,Y axis fwd-bwd.SAfety pin is not locked.Safety pin must be locked.
+46|2|Warning 0.2:
+46|3|Warning 0.3:Crane can not move Z axis.Safety pin is not unlocked.Safety pin must be unlocked.
+46|4|Warning 0.4:Crane can not move Z axis.Basket pin is in position to release basket.Basket pin must be in position to release basket.
+46|5|Warning 0.5:Crane can not move Z axis.Basket pin is in position to get basket.Basket pin must be in position to get basket.
+46|6|Warning 0.6:
+46|7|Warning 0.7:
+46|8|Warning 0.8:Stop from stop cycle / alarms.
+46|9|Warning 0.9:Crane not in load position X,Y axis.
+46|10|Warning 0.10:Crane not in unload position X,Y axis.
+46|11|Warning 0.11:
+46|12|Warning 0.12:
+46|13|Warning 0.13:
+46|14|Warning 0.14:
+46|15|Warning 0.15:Crane carriage can not move vertical.Proximity switch vertical reset is 1.
+46|16|Warning 0.16:
+46|17|Warning 0.17:
+46|18|Warning 0.18:
+46|19|Warning 0.19:
+46|20|Warning 0.20:
+46|21|Warning 0.21:
+46|22|Warning 0.22:
+46|23|Warning 0.23:
+46|24|Warning 0.24:
+46|25|Warning 0.25:
+46|26|Warning 0.26:
+46|27|Warning 0.27:
+46|28|Warning 0.28:Interlock signal from loading position is not active. 
+46|29|Warning 0.29:Interlock signal from unloading position is not active. 
+46|30|Warning 0.30:Ethernet communication error.Read message to conveyors PLC error.
+46|31|Warning 0.31:Ethernet communication error.Write message to conveyors PLC error.

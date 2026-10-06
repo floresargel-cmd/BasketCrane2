@@ -1,0 +1,1 @@
+R:\development\libs\#qt\qt.4.8.1.2010x32\bin\lupdate.exe R:\development\exe\aluminco\basketWarehouse R:\development\libs\hmiGuiWidgets -ts -no-obsolete aw1.ts

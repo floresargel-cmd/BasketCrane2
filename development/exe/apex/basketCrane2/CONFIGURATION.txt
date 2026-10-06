@@ -1,0 +1,187 @@
+Basket Crane 2 environment configuration
+
+Choose exactly one mode in basketCrane2.ini:
+  [Environment]
+  Mode=Live
+
+Mode          Databases                  PLC connections          Controls
+Test          Live databases, read-only   Loopback simulation      Simulated HMI only
+Live          Live databases, read/write  Configured live IPs      Normal live control
+LiveObserver  Live databases, read-only   Live crane reads only    View-only comparison
+
+All three modes use the same direct SQL Server endpoints, catalogs and account settings
+in the three database sections. Test does NOT use a separate test database;
+it cannot persist changes to these live databases. Only Live permits writes.
+There is no configurable emulation/write override: permissions follow Mode.
+
+Read-only modes expose a guarded SQL driver on every application database
+connection. It permits single SELECT statements, including prepared reads,
+and rejects mutations, SELECT INTO, batches, stored procedure execution,
+sequence advancement, remote query execution and update/exclusive lock hints
+before forwarding to the native SQL Server client. It supplies no native database handle and allows
+no transactions. The connection requests Application Intent=ReadOnly. Application writes are
+suppressed, including logging, table creation, cleanup and mission updates;
+the driver remains a second guard for writes from linked widget libraries.
+The configured catalog is selected in the native connection string during setup.
+This does not change or revoke privileges on the shared database accounts.
+
+Test has no live PLC connection. Both modes force the control library's
+no-PLC/emulation setting and substitute loopback addresses. LiveObserver also
+suppresses application PLC writes and disables HMI, mission and modify controls.
+A separate private reader polls crane toPcF and toPcI using read APIs only,
+without handshakes or output calls. Connection failures flag the display as stale.
+Observer labels use the current live EPICS RackDetail/SOItem data and HCA/HCB rules.
+Test can exercise simulated HMI controls; database-mutating workflows are
+disabled. Neither mode persists mission transitions to the live databases.
+
+One instance of each mode may run alongside the others using the updated
+executable. A second instance in the same mode is rejected, even if renamed.
+The window title and status bar identify the mode and effective permissions.
+Use separate INI copies and --config when running modes in parallel.
+
+The default INI location is beside the executable, independent of the working
+directory. To choose another file:
+  apexBasketCrane2D.exe --config "C:\plant\observer.ini"
+Set Mode=LiveObserver in observer.ini before launching it.
+Restart to apply edits. The current supplied INI selects Mode=LiveObserver and keeps the existing
+production values. Builds copy it only when no deployment INI exists.
+For an older INI, add [Environment] with Mode and remove Plc/Emulate.
+
+All keys are required; missing/unreadable files, missing/unknown keys, empty
+strings, invalid IPs, nonpositive integer settings or invalid modes prevent
+startup. Intervals are milliseconds. RetainedRows controls startup cleanup
+in Live only. Catalog names permit letters, digits and underscores.
+Passwords are plain text; apply appropriate filesystem access permissions.
+
+Direct SQL Server connections (no ODBC or DSN)
+The application uses Microsoft's MSOLEDBSQL19 provider directly through ADO,
+behind a Qt SQL adapter. Install Microsoft OLE DB Driver 19 for SQL Server with
+its x86 client on the target computer. The MSI checks for that provider.
+Download: https://learn.microsoft.com/sql/connect/oledb/download-oledb-driver-for-sql-server
+Each of BasketDatabase, EpicsDatabase and Epics2Database requires:
+  Server=sql-host,1433
+  Catalog=database_name
+  User=sql_account
+  Password=account_password
+  Encrypt=Mandatory
+  TrustServerCertificate=false
+Named instances are also accepted: Server=sql-host\\instance (double the
+backslash in Qt INI files). The client explicitly uses TCP. SQL authentication
+is retained; passwords are quoted and are never included in diagnostic output.
+Mandatory encryption validates the server certificate. Strict is also accepted;
+Optional and TrustServerCertificate=true are explicit compatibility settings,
+not automatic fallbacks. Use a trusted server certificate for normal deployment.
+Existing Dsn keys are rejected. One-time conversion on a machine with the old
+DSNs can preserve credentials, catalogs and mode while resolving each server:
+  powershell -File Migrate-Configuration.ps1 -Path C:\ProgramData\Apex\BasketCrane2\basketCrane2.ini
+The script creates a backup before atomically replacing the file. Server values
+can alternatively be supplied with -Servers @{BasketDatabase='host,1433';
+EpicsDatabase='host,1433';Epics2Database='host,1433'}. The application never reads
+the DSN registry and does not need any ODBC driver. No DSNs are created or deleted.
+Test database connectivity without constructing the HMI or connecting to PLCs:
+  apexBasketCrane2.exe --check-databases --config C:\ProgramData\Apex\BasketCrane2\basketCrane2.ini
+This opens each configured server/catalog and executes SELECT 1,DB_NAME() only.
+
+Offline checks (no HMI, PLC or database connections):
+  apexBasketCrane2D.exe --check-config --config "C:\plant\observer.ini"
+  apexBasketCrane2D.exe --check-safety
+  powershell -File tests\configuration.ps1 -Executable <built-exe-path>
+Check-config prints the effective permissions. Safety tests use a fake SQL
+backend to verify that direct/prepared/batch writes never reach it, validate
+SELECT results/bindings, and check parallel instance locks. Exit 0 means pass.
+
+Runtime configuration covers database connection settings, used PLC addresses,
+polling/handshake settings, timer periods, application passwords and retention.
+PLC register mappings, machine rules, schemas, styles and resources remain
+application definitions. Shared-library password overrides and Debug password
+bypass retain their previous behavior.
+
+Offline UI preview:
+  apexBasketCrane2D.exe --preview-ui C:\temp\crane2-ui.png
+Uses the same workspace/theme with sample values and the plant drawing.
+Does not construct plant database, PLC or mission objects.
+The UI follows Basket Crane 1: APEX header, dark slate theme, environment badge,
+rounded controls and panels, and readable logs. Machine coordinates and mission
+logic retain their existing behavior.
+
+Plant overview rendering:
+The viewport uses Crane 1's navy canvas. Equipment outlines keep a constant
+pixel width. Basket cards stay inside the original position footprint; they
+show ID, destination and profile:quantity, with more contents when zoomed in.
+Hover tooltips show the complete contents. Cards accept no mouse input, so
+the existing selection and position handlers remain responsible for clicks.
+Red means locked, pink source, blue target; HCA/P uses cyan and HCB/D amber.
+This changes drawing only; physical coordinates and control rules are retained.
+
+Export sidebar queues
+  Destacker B: c2exportsDestacker
+  Anodizing: c2exportsPacking
+  Packing Destacker A1: c2exportsPackingDestacker1
+  Packing Destacker A2: c2exportsPackingDestacker2
+Each queue refreshes independently and shows its basket count. Test and
+LiveObserver permit browsing, with queue edits disabled.
+
+Automatic missions
+The panel contains seven independent controls: exports to Destacker B, A1,
+A2 and anodizing, imports from North and South, and Epics. Each export control
+uses its matching sidebar queue. Test and LiveObserver disable all seven.
+Live starts with every control unchecked; startup does not enable automation.
+Dispatch priority is B, anodizing, A1, A2, then north/south imports. A1/A2 also
+check crane 3's respective queue and occupied destacker position (1520/1530).
+The south path must be clear before another south export is admitted.
+A1/A2 delivery to conveyor 1110 adds the basket to the matching crane 3 queue
+before clearing the crane 2 queue. Internal uncovering moves preserve exports.
+EPICS populates eligible top baskets using HCA/HCB destination rules and
+matching sales-order/line contents, with the reference source's queue limits.
+The active classifier routes HCB to B and HCA to A1/A2; anodizing remains
+available through its manually populated queue.
+Packing destacker exports use PLC destination 12 up to 7660 mm; longer baskets
+use route 11. B and anodizing retain routes 9 and 1 below 7821 mm, otherwise 11.
+The offline preview constructs the actual automatic panel and verifies its
+seven controls, unchecked startup state and environment enablement.
+
+3D overview
+The plant overview displays the 3D layout directly, without layout tabs. It is
+view-only in every environment. It consumes existing in-memory position and
+crane telemetry snapshots and adds no database or PLC connections.
+Left drag orbits, right/middle drag pans, the wheel zooms, and R resets the
+camera. Horizontal and vertical scrollbars also pan the zoomed layout. They
+remain visible and track the current zoom, camera angle and drag position.
+Reset view and Top view center both scrollbars. Click a basket to inspect its profile quantities and lengths.
+Crane telemetry updates X/Y/Z; missing or stale telemetry is marked on screen.
+Layout footprints match the 2D drawing; equipment shapes, basket height,
+gantry height and lift baseline are illustrative, not CAD calibrated.
+Offline check: --preview-ui <image.png>
+
+Basket details are drawn within each basket footprint in the 3D layout, with basket ID,
+destination, and profile:quantity:destination rows. Click for full lengths.
+
+Default camera is a shallow overhead view aligned to the old layout.
+Basket details stay inside basket outlines; zoom in for larger text.
+
+MSI installations use the administrator-managed INI at
+C:\ProgramData\Apex\BasketCrane2\basketCrane2.ini through the Start Menu shortcut.
+See installer\README.txt for packaging and versioning instructions.
+
+Error email notifications
+[EmailAlerts] uses the same keys and relay behavior as Basket Crane 1.
+SmtpFrom=BasketCrane2Application@lorvalcapital.ca
+SmtpSubjectPrefix="[Basket Crane 2 Error] : "
+The subject appends "Application Error". SMTP runs in a background worker.
+The first error is sent immediately, then subsequent errors are grouped using
+ErrorEmailIntervalMinutes (60 by default). Failed batches remain queued for
+retry at that interval; normal/fatal shutdown allows a bounded final attempt.
+Bodies include host, application version, event count and timestamped errors,
+with a 16384-character detail limit. Delivery status is written to stderr.
+Missing EmailAlerts settings keep alerts disabled for existing INIs. Invalid
+email settings disable notifications and report their key names without
+preventing the HMI from starting. --check-config also displays that diagnostic.
+SmtpEnableSsl=true uses STARTTLS with Windows certificate validation.
+Authentication requires STARTTLS and a password. SmtpPassword can use
+${ENV:BASKET_CRANE_SMTP_PASSWORD}; the worker sends credentials over stdin,
+not process arguments. The configured port-25 relay uses no authentication.
+Restart the application after editing. Offline --check-config, --check-safety
+and --preview-ui do not start SMTP. Test/LiveObserver can email actual runtime
+errors when enabled; database/PLC write permissions are unchanged.
+Tests/EmailAlerts.Tests.vcxproj uses only a loopback SMTP fixture to validate
+delivery, batching, retry, TLS rejection, timeout, configuration and shutdown.

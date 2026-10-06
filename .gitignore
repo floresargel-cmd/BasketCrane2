@@ -48,3 +48,17 @@ Thumbs.db
 *.mov
 *.wmv
 
+# Generated/runtime folders
+\#builds/
+\#workingDir/
+
+# Generated/runtime folders
+\#builds/
+\#workingDir/
+/development/libs/\#qt/
+
+# Local IDE state, credentials and recovery backups
+.vs/
+*.user
+*.bak
+/development/exe/apex/basketCrane2/basketCrane2.ini

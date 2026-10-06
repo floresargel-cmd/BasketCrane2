@@ -1,0 +1,18 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+[*.{cpp,h}]
+cpp_indent_braces = false
+cpp_indent_namespace_contents = false
+cpp_new_line_before_open_brace_function = new_line
+cpp_new_line_before_open_brace_type = new_line
+
+[*.{vcxproj,filters,props}]
+indent_size = 2

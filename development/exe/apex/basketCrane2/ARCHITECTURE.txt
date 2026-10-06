@@ -1,0 +1,185 @@
+Basket Crane 2: object-oriented design and Microsoft C++ conventions
+
+Baseline
+This is a native Win32 C++ application using Qt 5.7 and existing vendor static
+libraries. It remains C++; Microsoft .NET Enterprise Library is not applicable.
+The current refactor adopts Microsoft's modern C++ resource-management guidance
+and Core Guidelines. This is a code-quality baseline, not a certification.
+
+Class responsibilities
+- BasketCraneApplication: command-line modes, validated configuration, instance
+  lock, GUI startup and event-loop lifetime. m.cpp delegates to this class.
+- StartupProgress: owns its splash widget by value and releases it automatically.
+  Existing constructors access only a temporary non-owning progress observer.
+- DatabaseInitializer: owns the table creation, retention and mission seeding
+  responsibility formerly embedded in the main-window constructor. It accepts a
+  connection name. It preserves environment write guards and existing schemas.
+- DestinationCatalog: immutable destination records, pairing names with strongly
+  typed PLC IDs. Repeated window construction cannot append duplicate entries.
+- AuditLogger: operational, GUI and verbose audit behavior, including field limits
+  and mirrored verbose entries. It depends on ICommandExecutor, allowing offline
+  tests to replace database access without constructing UI or plant connections.
+- PasswordAuthorization: verifies nonempty input against the existing credential
+  verifier or required configured password. Debug builds cannot bypass access
+  checks. Canceled prompts never authorize a command.
+- SqlCommandExecutor: policy enforcement and prepared SQL execution on an existing
+  named connection. User text is bound as values; it is never inserted into SQL.
+  Failures propagate as status values and existing log adapters report to stderr.
+
+Conventions for new and migrated code
+Use focused classes and explicit constructor dependencies. Use the basket
+namespace, PascalCase class/member-function names and descriptive private members
+with trailing underscores. Retain existing Qt slot names during gradual migration.
+Use enum class for domain constants, const references for read-only inputs, and
+virtual destructors on interfaces. Prefer stack ownership and Qt parent ownership;
+use unique ownership for unparented heap objects. Do not give a QObject both a Qt
+parent owner and an independent smart-pointer owner. Keep database operations out
+of UI event handlers as responsibilities are migrated into repositories/services.
+Use SQL parameters for values and fixed/validated identifiers for table names.
+
+Tooling
+.editorconfig defines four-space source indentation and UTF-8/CRLF conventions.
+The Visual Studio project selects C++14 (compatible with the existing Qt ABI) and
+SDL checks. Optional /p:EnterpriseAnalysis=true enables level-4 warnings and MSVC
+static analysis. Legacy/vendor diagnostics are not automatically errors; review
+and remediate them before promoting warnings to errors. The old Qt/vendor ABI is
+retained; changing toolchain, Qt version, architecture or structure layouts needs
+separate compatibility validation.
+
+Offline validation
+Build Debug|Win32 and Release|Win32 with Visual Studio MSBuild. Use separate
+IntDir/OutDir overrides when validating to avoid replacing deployed executables.
+Run the executable with --check-safety for the SQL guard, environment lock,
+observer classification, destination IDs and audit regression tests. Run
+powershell -File tests/configuration.ps1 -Executable <built-executable> for the
+configuration cases; place basketCrane2.ini beside the isolated executable for
+its default-path case. --preview-ui <png-path> provides an offline UI fixture.
+No test requires PLC access or a production database.
+
+Remaining migration scope
+The legacy QWidget classes already use inheritance and encapsulation, but some
+still combine UI, SQL and PLC responsibilities. Their database/PLC dependencies,
+mission logic, password globals and shared vendor-library globals remain to be
+migrated. The compatibility log functions are adapters so existing callers retain
+behavior while migrated code can depend on AuditLogger directly. The progress
+observer is a transitional scoped service. Full removal of shared state requires
+changes to the linked shared libraries as well as this executable. Hardware
+mission behavior requires validation in the established plant test environment.
+
+References
+https://learn.microsoft.com/en-us/cpp/cpp/welcome-back-to-cpp-modern-cpp
+https://learn.microsoft.com/en-us/cpp/cpp/object-lifetime-and-resource-management-modern-cpp
+https://microsoft.github.io/OfficeCppGuidelines/CppCoreGuidelines.html
+Validation completed 2026-10-05
+Debug|Win32 and Release|Win32 built with VS v143 and SDL checks.
+All 19 configuration/safety checks passed for each configuration.
+The safety mode additionally passed authorization, audit, destination, observer,
+SQL guard and instance-lock regressions. The offline UI preview generated a PNG.
+Project XML/header references and git diff whitespace checks passed.
+Existing Qt/vendor libraries report LNK4099 for unavailable PDB files.
+EnterpriseAnalysis is available but was not run as part of this validation.
+Production database/PLC integration was not exercised.
+
+SQL transactions and deadlock recovery
+SqlTransactionExecutor, SqlTransactionRunner and QtSqlTransactionSession own SQL
+Server transactions. SQL commands run between BEGIN TRANSACTION and COMMIT;
+failed attempts are rolled back. Explicit server-side commands preserve native
+native SQL Server error codes through the Qt adapter.
+
+Only native SQL Server deadlock-victim error 1205 is retried. MaxRetries=3 means
+one initial attempt plus three retries, at most four executions. The entire group
+is replayed, including successful earlier statements and every bulk row. Delays
+are 100/200/400 ms plus 0-50 ms of random jitter, after rollback. Result values
+from rolled-back attempts are discarded. Other SQL errors, ambiguous commit
+failures, begin failures and rollback failures stop immediately. A failed rollback
+requires investigation/recovery of that connection before further application
+writes; it is never assumed to have succeeded.
+
+The API owns the transaction and refuses connections with an existing server
+transaction. Do not supply BEGIN/COMMIT/ROLLBACK statements or stored procedures
+that manage their own transactions. Keep PLC changes, UI changes and other
+external side effects outside the SQL replay loop. Connections remain confined
+to their owning thread. This is SQL Server-specific, not a general database API.
+
+Coverage in application code
+- Existing basketExecQuery mutations use transactions and deadlock recovery.
+  SELECT-only queries and independently linked vendor SQL helpers retain their
+  established paths; the executor does not retrofit those vendor libraries.
+- Operational/GUI audit entries and their verbose mirrors commit together.
+- Next-to-active mission promotion updates both mission rows in one transaction.
+- Removing a basket from export queues deletes from all queues atomically.
+- Export-priority swaps reread priorities under update/serializable locks inside
+  the transaction and perform all three updates before commit.
+- Test/LiveObserver/unloaded configurations skip write transactions and bulk
+  batches before looking up a database connection.
+
+Parameterized bulk rows (row-major input)
+    QVector<QVector<QVariant>> rows;
+    rows << (QVector<QVariant>() << 42 << "First message")
+         << (QVector<QVariant>() << 43 << "Second message");
+    basketExecBulk("INSERT INTO your_table (id,message) VALUES (?,?)", rows, bDb);
+
+Combining bulk and other commands in one transaction
+    QVector<basket::SqlCommand> commands;
+    commands << basket::SqlCommand("UPDATE your_table SET status=? WHERE id=?",
+        QVector<QVariant>() << "ready" << 42);
+    commands << basket::SqlCommand::Bulk(
+        "INSERT INTO your_table (id,message) VALUES (?,?)", rows);
+    basketExecTransaction(commands, bDb);
+
+SqlCommandExecutor exposes ExecuteBulk and ExecuteTransaction with bool status,
+LastError and LastResult (attempt count, skipped policy status, result values).
+The legacy basketExec* wrappers retain the application's fatal error handler
+when an operation ultimately fails. Bulk uses QSqlQuery::execBatch(ValuesAsRows);
+Qt may emulate rows individually, but the explicit transaction keeps them
+atomic. This is parameterized batching rather than the SQL Server file import
+BULK INSERT protocol. Every nonempty bulk row must have the same column count.
+
+Offline transaction regressions
+--check-safety includes commit/rollback, full replay, retry exhaustion, nonretryable
+errors, commit ambiguity, failed rollback/begin, RAII exception cleanup, bulk row
+atomicity, mixed scalar/bulk groups, invalid row shape, read-only policy and caller
+transaction ownership. A fake Qt SQL driver exercises actual prepared bindings
+and execBatch behavior, including an injected deadlock during a partial batch.
+Actual SQL Server and plant integration still require environment validation.
+
+Direct SQL Server transport
+nativeSqlServer.cpp uses Microsoft's MSOLEDBSQL19 ADO/OLE DB provider, never
+MSDASQL or QODBC. It preserves native SQL Server error codes, materializes result
+sets with their field metadata, and converts Unicode, binary, date/time and exact
+decimal values into QVariant. The Qt adapter emulates parameter binding and
+batches within the existing explicit transaction. Read-only connections remain
+behind the SELECT-only driver; application intent is additional routing advice,
+not a substitute for that guard or database permissions.
+qtSqlDatabaseNoOdbc.cpp recompiles the matching repository Qt database registry
+with built-in database factories disabled. This application supplies explicit
+custom drivers. The shared Qt library is unchanged; its old ODBC factory and
+driver objects are no longer linked into this executable. Native transport tests
+inspect the EXE's PE import directory and reject any ODBC DLL dependency.
+
+Reference
+https://learn.microsoft.com/en-us/sql/relational-databases/sql-server-deadlocks-guide
+Transaction validation completed 2026-10-05
+Debug|Win32 and Release|Win32 builds passed with SDL checks enabled.
+All 19 configuration/safety cases passed in each build, including the expanded
+transaction regression suite. The standalone Qt SQL transaction fixture also
+passed. It verifies both fourth-attempt success and four-attempt exhaustion.
+Project XML, header references and tracked-source whitespace checks passed.
+Existing vendor PDB warnings remain. No live SQL Server or PLC was contacted.
+
+Observer PLC message logging (2026-10-05)
+The full HMI's five legacy bit-log widgets receive an empty primary log table
+when databaseWritesAllowed() is false. PLC telemetry still updates the widgets,
+but automatic c2plcMessages inserts are disabled in Test and LiveObserver.
+Live mode retains its PLC message history logging. The SQL read-only guard
+continues to reject writes from any other path. The offline UI preview checks
+the actual linked bitClass through initial, on/off and forced-log updates with
+no log table, verifying that display values change without database queries.
+
+Release versioning and installation (2026-10-05)
+version.h starts at 2.5.8 and supplies application/Windows EXE/MSI metadata.
+The Qt 5.7.0 toolchain project and library filenames remain independent.
+installer\Set-Version.ps1 explicitly increments release versions, rolling
+patch/minor 99 to zero and carrying to the next field. Packaging never bumps
+a version implicitly. The installer project, scripts, Windows MSI policies,
+configuration lifecycle and offline checks are documented in installer\README.txt.

@@ -1,0 +1,16 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <InstallerBuildDirectory Condition="'$(InstallerBuildDirectory)'==''">$(MSBuildThisFileDirectory)out</InstallerBuildDirectory>
+    <InstallerLocalAppData>$([System.Environment]::GetFolderPath(SpecialFolder.LocalApplicationData))</InstallerLocalAppData>
+    <WixPath Condition="'$(WixPath)'=='' and Exists('C:\build-tools\wix4\wix.exe')">C:\build-tools\wix4\wix.exe</WixPath>
+    <WixPath Condition="'$(WixPath)'=='' and Exists('$(InstallerLocalAppData)\Apex\build-tools\wix4\wix.exe')">$(InstallerLocalAppData)\Apex\build-tools\wix4\wix.exe</WixPath>
+    <WixPath Condition="'$(WixPath)'=='' and Exists('$(USERPROFILE)\.dotnet\tools\wix.exe')">$(USERPROFILE)\.dotnet\tools\wix.exe</WixPath>
+    <InstallerVersionArguments Condition="'$(InstallerSkipVersionIncrement)'=='true'">-SkipVersionIncrement</InstallerVersionArguments>
+  </PropertyGroup>
+  <Target Name="Build">
+    <Exec Command="powershell.exe -NoProfile -File &quot;$(MSBuildThisFileDirectory)Build-Installer.ps1&quot; -Wix &quot;$(WixPath)&quot; -BuildDirectory &quot;$(InstallerBuildDirectory)&quot; $(InstallerVersionArguments)" />
+  </Target>
+  <Target Name="NextVersion">
+    <Exec Command="powershell.exe -NoProfile -File &quot;$(MSBuildThisFileDirectory)Set-Version.ps1&quot; -Next" />
+  </Target>
+</Project>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32"><Configuration>Debug</Configuration><Platform>Win32</Platform></ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32"><Configuration>Release</Configuration><Platform>Win32</Platform></ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{4DF39D54-6B02-4EB8-9BF1-34637AB5D1A8}</ProjectGuid>
+    <ProjectName>Installer</ProjectName>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <PropertyGroup>
+    <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
+    <OutDir>$(MSBuildThisFileDirectory)out\</OutDir>
+    <IntDir>$(MSBuildThisFileDirectory)out\obj\Installer\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="ApexBasketCrane2.Installer.proj" />
+    <None Include="Build-Installer.ps1" />
+    <None Include="Package.wxs" />
+    <None Include="Set-Version.ps1" />
+    <None Include="Versioning.ps1" />
+    <None Include="README.txt" />
+    <None Include="basketCrane2.template.ini" />
+    <None Include="..\tests\installer.ps1" />
+    <None Include="..\tests\versioning.ps1" />
+    <None Include="..\version.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Target Name="BuildInstaller" AfterTargets="Build">
+    <Message Text="Building the Release x86 MSI installer..." Importance="high" />
+    <PropertyGroup>
+      <!-- The solution dependency already built and versioned the Release application. -->
+      <InstallerSkipVersionIncrement Condition="'$(Configuration)'=='Release' and ('$(BuildingInsideVisualStudio)'=='true' or '$(BuildingSolutionFile)'=='true')">true</InstallerSkipVersionIncrement>
+    </PropertyGroup>
+    <MSBuild Projects="$(MSBuildThisFileDirectory)ApexBasketCrane2.Installer.proj"
+             Targets="Build" RemoveProperties="OutDir;IntDir;TargetName;TargetExt"
+             Properties="InstallerSkipVersionIncrement=$(InstallerSkipVersionIncrement)" />
+  </Target>
+</Project>

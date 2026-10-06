@@ -1,0 +1,32 @@
+27|0|Signal from oven1:Not safe from position 661-664.
+27|1|Signal from oven1:Not safe from position 671-674.
+27|2|Signal from oven1:Not safe from position 681-684.
+27|3|Signal from oven1:Not safe from position 691-694.
+27|4|Signal from oven2:Not safe from position 1041-1044.
+27|5|Signal from oven2:Not safe from position 1051-1054.
+27|6|Signal from oven2:Not safe from position 1061-1064.
+27|7|Signal from conveyor 6:Not safe from position 1111.
+27|8|Signal from return conveyor1:Not safe from position 701-703.
+27|9|Signal from return conveyor1:Position 701 photocell "on".
+27|10|Signal from return conveyor1:Position 702-3 photocell "off".
+27|11|
+27|12|
+27|13|
+27|14|
+27|15|
+27|16|
+27|17|
+27|18|
+27|19|
+27|20|
+27|21|
+27|22|
+27|23|
+27|24|
+27|25|
+27|26|
+27|27|
+27|28|
+27|29|
+27|30|
+27|31|

@@ -1,0 +1,39 @@
+﻿15|0|Alarm  0.0:CB11.24 Volt DC alarm.%Σφάλμα  0.0:CB11.Έλλειψη τάσης 24V DC.
+15|1|Alarm  0.1:CB11.Stop cycle button pressed on OP.%Σφάλμα  0.1:CB10.Στοπ κύκλου.
+15|2|Alarm  0.2:CB11.Thermal overload DQ1.Alarm from inverter CU1.//Inverter fault or ethernet communication problem.%Σφάλμα  0.2:CB11.Πτώση θερμομαγνητικού διακόπτη DQ1 ή σφάλμα inverter DU1.
+15|3|Alarm  0.3:CB11.Thermal overload CQ2.Alarm from inverter CU2.//Inverter fault or ethernet communication problem.%Σφάλμα  0.3:CB10.Πτώση θερμομαγνητικού διακόπτη CQ2 ή σφάλμα inverter CU2.
+15|4|Alarm  0.4:CB11.Thermal overload DQ11,DQ12,DQ13,DQ14,DQ15,DQ16,DQ17%Σφάλμα  0.4:CB11.Πτώση θερμομαγνητικού διακόπτη DQ11,DQ12,DQ13,DQ14,DQ15,DQ16,DQ17.
+15|5|Alarm  0.5:CB11.
+15|6|Alarm  0.6:CB11.Overtime for active command.Possible problem.%Σφάλμα  0.6:CB11.Μεγαλη διάρκεια κίνησης.Πιθανό πρόβλημα.
+15|7|Alarm  0.7:CB11.Command 21->20 alarm.//Basket not in correct position.%Κίνηση 21->20.Το καλαθι δε σταματησε σωστα στον 20.
+15|8|Alarm  0.8:CB11.Thermal overload DQ.Alarm from 1769-AENT.//1734-AENT fault or ethernet communication problem.%Σφάλμα  0.8:CB11.Πρόβλημα στην μονάδα 1734-AENT.
+15|9|Alarm  0.9:
+15|10|Alarm 0.10:
+15|11|Alarm 0.11:
+15|12|Alarm 0.12:
+15|13|Alarm 0.13:
+15|14|Alarm 0.14:
+15|15|Alarm 0.15:
+15|16|Alarm 0.16:
+15|17|Alarm 0.17:
+15|18|Alarm 0.18:
+15|19|Alarm 0.19:
+15|20|Alarm 0.20:
+15|21|Alarm 0.21:
+15|22|Alarm 0.22:
+15|23|Alarm 0.23:
+15|24|Alarm 0.24:
+15|25|Alarm 0.25:
+15|26|Alarm 0.26:
+15|27|Alarm 0.27:
+15|28|Alarm 0.28:
+15|29|Alarm 0.29:
+15|30|Alarm 0.30:
+15|31|Alarm 0.31:
+
+
+
+
+
+
+

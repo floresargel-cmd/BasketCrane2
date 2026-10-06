@@ -1,0 +1,35 @@
+﻿52|0|Alarm 0.0:24 Volt DC alarm.Thermal overload CB1.Q29 tripped.PS alarm.//Relay K29-K34 off or aux selection switch is off.Input 424 off.
+52|1|Alarm 0.1:Stop cycle button pressed on Destacker2 OP.
+52|2|Alarm 0.2:Thermal overload CB1:Q5,Q500,Q501,Q6.
+52|3|Alarm 0.3:Thermal overload CB1:Q8,Q800.
+52|4|Alarm 0.4:
+52|5|Alarm 0.5:Thermal overload CB1.Q5.Alarm from inverter U5.Inverter fault or ethernet communication problem.
+52|6|Alarm 0.6:Εthernet module 1769-AENTR fault or communication problem.
+52|7|Alarm 0.7:
+52|8|Alarm 0.8:
+52|9|Alarm 0.9:
+52|10|Alarm 0.10:Alarm from encoder vertical axis.Encoder card fault.Reset vertical in manual mode.
+52|11|Alarm 0.11:Alarm from encoder horizontal axis.Encoder card fault.Reset horizontal in manual mode.
+52|12|Alarm 0.12:
+52|13|Alarm 0.13:Destacker2 valve "hooks inside" but no feedback from magnetic switch.Check valve.Check magnetic switch.
+52|14|Alarm 0.14:Destacker2 valve  "hooks out" but no feedback from magnetic switch.Check valve.Check magnetic switch.
+52|15|Alarm 0.15:Destacker2 horizontal axis overspeed.                                                                                        
+52|16|Alarm 0.16:Destacker2 horizontal axis underspeed.
+52|17|Alarm 0.17:Destacker2 vertical axis overspeed.
+52|18|Alarm 0.18:Destacker2 vertical axis underspeed.
+52|19|Alarm 0.19:
+52|20|Alarm 0.20:
+52|21|Alarm 0.21:
+52|22|Alarm 0.22:
+52|23|Alarm 0.23:
+52|24|Alarm 0.24:
+52|25|Alarm 0.25:
+52|26|Alarm 0.26:
+52|27|Alarm 0.27:
+52|28|Alarm 0.28:
+52|29|Alarm 0.29:
+52|30|Alarm 0.30:
+52|31|Alarm 0.31:
+
+
+
