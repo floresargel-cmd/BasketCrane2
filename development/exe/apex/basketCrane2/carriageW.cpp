@@ -57,7 +57,7 @@ void carriageWidgetClass::popUpList()
 	logTable->setColumnCount(4);
 	logTable->setHorizontalHeaderLabels(QStringList()<<tr("Message")<<tr("Description")<<tr("type")<<"Time");
 	logTable->setWordWrap (true);
-	QVector<QVector<QVariant>> dataVV=execTableQuery(QString("select top 300 mess,details,type,time from c2logGui where messenger='%1' order by tid desc").arg(logGuiName),bDb);
+	QVector<QVector<QVariant>> dataVV=readCraneControllerHistory(300);
 	logTable->setRowCount(dataVV.count());
 	for (int i=0;i<dataVV.count();i++)
 	{
@@ -78,7 +78,7 @@ void carriageWidgetClass::popUpList()
 }
 void carriageWidgetClass::loadFromDataBase()
 {
-	QVector<QVector<QVariant>> dataVV=execTableQuery(QString("select top 100 mess,details,type,time from c2logGui where messenger='%1' order by tid desc").arg(logGuiName),bDb);
+	QVector<QVector<QVariant>> dataVV=readCraneControllerHistory(100);
 	bool unchanged=logGuiList->count()==dataVV.count();
 	for (int i=0;unchanged && i<dataVV.count();++i)
 		unchanged=logGuiList->item(i)->text()==controllerHistoryText(dataVV[i][0].toString(),dataVV[i][3])

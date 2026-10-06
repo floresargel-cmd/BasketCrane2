@@ -185,3 +185,14 @@ and --preview-ui do not start SMTP. Test/LiveObserver can email actual runtime
 errors when enabled; database/PLC write permissions are unchanged.
 Tests/EmailAlerts.Tests.vcxproj uses only a loopback SMTP fixture to validate
 delivery, batching, retry, TLS rejection, timeout, configuration and shutdown.
+
+Legacy controller movement history
+LiveObserver can display basket IDs for older "Move basket from X to Y" events
+without upgrading or writing to the Live controller. Both crane history panels
+and expanded history dialogs use a SELECT-only position-audit lookup. Recovery
+requires the same recorded timestamp, source PLC ID and destination PLC ID,
+with exactly one distinct nonzero basket ID. Decimal position indices in
+c2logPos are converted to the corresponding PLC IDs. Missing or conflicting
+audits leave the original event unchanged. The display never guesses from the
+basket currently at a position, and stored controller history is not modified.
+The upper panel retains its startup snapshot; restarting refreshes that snapshot.

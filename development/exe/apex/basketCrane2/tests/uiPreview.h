@@ -18,6 +18,8 @@ public:
 protected:
     bool reset(const QString& sql) override {
         ++*calls; rows.clear(); logQuery=sql.contains("from c2logGui",Qt::CaseInsensitive);
+        auditQuery=sql.contains("from c2logPos",Qt::CaseInsensitive);
+        if (auditQuery && sql.startsWith("select ",Qt::CaseInsensitive)) { rows << 52; setSelect(true); setActive(true); setAt(-1); return true; }
         if (logQuery && sql.startsWith("select ",Qt::CaseInsensitive)) {
             rows << 5; setSelect(true); setActive(true); setAt(-1); return true;
         }
@@ -27,6 +29,7 @@ protected:
         setSelect(true); setActive(true); setAt(-1); return true;
     }
     QVariant data(int column) override {
+        if (auditQuery) return (QVector<QVariant>()<<1300.0<<52<<"from 1110.1"<<"2026-10-05 12:00:00").value(column);
         if (logQuery) return (QStringList()<<*message<<"Controller event"<<"info"<<"2026-10-05 12:00:00").value(column);
         return column==0 ? rows.value(at()) : at()+1;
     }
@@ -38,12 +41,14 @@ protected:
     int numRowsAffected() override { return 0; }
     QSqlRecord record() const override {
         QSqlRecord r;
-        if (logQuery) { foreach (const QString& name,QStringList()<<"mess"<<"details"<<"type"<<"time") r.append(QSqlField(name,QVariant::String)); }
+        if (auditQuery) { foreach (const QString& name,QStringList()<<"pos"<<"basket"<<"info"<<"time") r.append(QSqlField(name,QVariant::String)); }
+        else if (logQuery) { foreach (const QString& name,QStringList()<<"mess"<<"details"<<"type"<<"time") r.append(QSqlField(name,QVariant::String)); }
         else { r.append(QSqlField("basket",QVariant::Int)); r.append(QSqlField("priority",QVariant::Int)); }
         return r;
     }
 private:
     bool logQuery=false;
+    bool auditQuery=false;
     QVector<int> rows;
     int *calls;
     QString *message;
@@ -62,8 +67,33 @@ public:
 // Offline visual fixture: shares the production workspace and theme, uses the
 // real plant drawing, and never constructs DB/PLC/mission control objects.
 inline bool basketUiPreview(const QString& file, const QString& mode) {
+    {
+        const QString time="2026-10-06 14:48:01";
+        const auto movement=[&](const QString& message) { return QVector<QVariant>()<<message<<"Moving basket"<<"info"<<time; };
+        QVector<QVector<QVariant>> events;
+        events << movement("Move basket from 1111 to 1300") << movement("Move basket from 1300 to 702")
+            << movement("Move basket #93 from 1111 to 1300") << movement("Plc step:6");
+        QVector<QVector<QVariant>> audits;
+        audits << (QVector<QVariant>()<<1300.0<<52<<"from 1110.1"<<time)
+            << (QVector<QVariant>()<<700.2<<81<<"from 1300.0"<<"2026-10-06 14:48:02");
+        recoverControllerBasketNumbers(events,audits);
+        if (events[0][0].toString()!="Move basket #52 from 1111 to 1300"
+            || events[1][0].toString()!="Move basket from 1300 to 702"
+            || events[2][0].toString()!="Move basket #93 from 1111 to 1300"
+            || events[3][0].toString()!="Plc step:6") return false;
+        events[0]=movement("Move basket from 1111 to 1300");
+        audits << (QVector<QVariant>()<<1300.0<<93<<"from 1110.1"<<time);
+        recoverControllerBasketNumbers(events,audits);
+        if (events[0][0].toString()!="Move basket from 1111 to 1300") return false;
+        std::puts("PASS: legacy movement history recovers basket IDs only from exact, unambiguous position audit matches.");
+    }
     BasketPreviewQueueDriver *fixtureDriver = new BasketPreviewQueueDriver;
     QSqlDatabase::addDatabase(fixtureDriver,bDb);
+    fixtureDriver->historyMessage="Move basket from 1111 to 1300";
+    const auto legacyHistory=readCraneControllerHistory(100);
+    if (legacyHistory.size()!=1 || legacyHistory[0][0].toString()!="Move basket #52 from 1111 to 1300") return false;
+    fixtureDriver->historyMessage="Plc step:5";
+    std::puts("PASS: observer history loads matching position audits through a SELECT-only prepared query.");
     if (mode!="Live") {
         carriageWidgetClass mission;
         QLabel *step=mission.findChild<QLabel*>("activeCraneStep");
