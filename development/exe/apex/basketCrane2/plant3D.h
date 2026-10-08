@@ -12,7 +12,7 @@ struct Plant3DSlot {
     QPointF pickupAnchor;
     bool hasPickupAnchor=false;
     int key=0, basket=0;
-    QString destination, details;
+    QString destination, details, hoverDetails;
     QStringList rows;
     QList<QPolygonF> sourcePaths, targetPaths;
     bool locked=false, source=false, target=false;
@@ -78,9 +78,21 @@ public:
     int visibleMissionMarkerCount() const { return missionMarkers; }
     int visibleBasketCount() const { int n=0; foreach (const Plant3DSlot& slot,scene.positions3D) if (slot.basket>0) ++n; return n; }
 protected:
-    void mousePressEvent(QMouseEvent *e) override { start=last=e->pos(); dragged=false; }
+    bool event(QEvent* event) override {
+        if (event->type()==QEvent::ToolTip) {
+            QHelpEvent* help=static_cast<QHelpEvent*>(event);
+            const QString text=hoverTextAt(help->pos());
+            if (!text.isEmpty()) QToolTip::showText(help->globalPos(),Qt::convertFromPlainText(text),this);
+            else QToolTip::hideText();
+            event->accept(); return true;
+        }
+        return QWidget::event(event);
+    }
+    void leaveEvent(QEvent* event) override { QToolTip::hideText(); QWidget::leaveEvent(event); }
+    void mousePressEvent(QMouseEvent *e) override { QToolTip::hideText(); start=last=e->pos(); dragged=false; }
     void mouseMoveEvent(QMouseEvent *e) override {
         QPoint delta=e->pos()-last; last=e->pos();
+        if (e->buttons()!=Qt::NoButton) QToolTip::hideText();
         if ((e->pos()-start).manhattanLength()>4) dragged=true;
         if (e->buttons()&Qt::RightButton || e->buttons()&Qt::MiddleButton) { pan+=delta; update(); }
         else if (e->buttons()&Qt::LeftButton) { yaw+=delta.x()*0.008; elevation=qBound(0.15,elevation+delta.y()*0.006,1.52); update(); }
@@ -185,6 +197,19 @@ private:
     struct Face { QPolygonF polygon; QColor color; double depth; int key; QString label; bool selected; };
     struct Hit { QPainterPath path; int key; };
     Provider provider; Plant3DScene scene; QVector<Face> faces; QVector<Hit> hits;
+    QString hoverTextAt(const QPoint& point) const {
+        for (int i=hits.size()-1;i>=0;--i) {
+            if (!hits[i].path.contains(point)) continue;
+            if (hits[i].key==-2 && scene.carriedBasket>0)
+                return QString("Basket: %1 | On crane\nDestination: %2\n%3")
+                    .arg(scene.carriedBasket).arg(scene.carriedDestination)
+                    .arg(scene.carriedRows.isEmpty()?QString("Empty basket"):scene.carriedRows.join("\n"));
+            foreach (const Plant3DSlot& slot,scene.positions3D)
+                if (slot.key==hits[i].key && slot.basket>0)
+                    return slot.hoverDetails.isEmpty()?slot.details:slot.hoverDetails;
+        }
+        return QString();
+    }
     QScrollBar* horizontalScroll=nullptr;
     QScrollBar* verticalScroll=nullptr;
     void synchronizeScrollBars(const QSizeF& contentSize) {

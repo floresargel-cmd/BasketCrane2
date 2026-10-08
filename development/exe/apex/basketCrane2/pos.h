@@ -84,6 +84,7 @@ public:
 	QString getDescription();
     QRectF displayFootprint() const { return posItem->sceneBoundingRect(); }
     QString displayBasketDetails() const;
+    QString displayHoverDetails() const;
     QString displayDestination() const;
     QStringList displayBasketRows() const;
     bool displayIsTarget() const { return isTo; }

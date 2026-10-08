@@ -177,6 +177,7 @@ mainWindowClass::mainWindowClass():QMainWindow()
             slot.key=position->getPositionNumber()*100+position->getPositionIndex();
             slot.basket=position->getBasketNumber(); slot.destination=position->displayDestination();
             slot.details=position->displayBasketDetails(); slot.rows=position->displayBasketRows(); slot.locked=position->getIsLocked();
+            slot.hoverDetails=position->displayHoverDetails();
             slot.source=position->getIsFrom(); slot.target=position->displayIsTarget();
             if (slot.source) slot.sourcePaths=position->displaySourcePaths();
             if (slot.target) slot.targetPaths=position->displayTargetPaths();

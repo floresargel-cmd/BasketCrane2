@@ -280,6 +280,7 @@ inline bool basketUiPreview(const QString& file, const QString& mode) {
             else slot.targetPaths=transform.map(path).toSubpathPolygons();
         }
         slot.details=QString("Basket %1 | Position %2 | Profile 2109: %3 pieces, 7000 mm").arg(slot.basket).arg(slot.key).arg(i+25);
+        slot.hoverDetails=slot.details+"\nTemper: T5\nCustomer: Sample customer";
         sample.positions3D<<slot;
     }
     // Cross station footprints so previews reveal equipment covering the beam.
@@ -318,6 +319,21 @@ inline bool basketUiPreview(const QString& file, const QString& mode) {
         QString inspected;
         const auto showDetails=threeD->inspected;
         threeD->inspected=[&inspected,showDetails](const QString& text){inspected=text; showDetails(text);};
+        bool hovered=false;
+        for (int y=50;y<threeD->height()-50 && !hovered;y+=14)
+            for (int x=20;x<threeD->width()-20 && !hovered;x+=14) {
+                QHelpEvent hover(QEvent::ToolTip,QPoint(x,y),threeD->mapToGlobal(QPoint(x,y)));
+                QApplication::sendEvent(threeD,&hover);
+                const QString hoverText=QToolTip::text().replace(QChar(0x00a0),QChar(' '));
+                hovered=hoverText.contains("Profile 2109:") && hoverText.contains("Temper: T5")
+                    && hoverText.contains("Customer: Sample customer");
+            }
+        if (!hovered || inspected.startsWith("Basket ") || inspected.startsWith("Crane basket:")) {
+            std::fprintf(stderr,"Preview: hover details without clicking failed: hovered=%d, selected=%s, tooltip=%s\n",
+                int(hovered),qPrintable(inspected),qPrintable(QToolTip::text())); return false;
+        }
+        QToolTip::hideText();
+        std::puts("PASS: hovering shows basket/profile details without clicking or changing the selected basket.");
         for (int y=50;y<threeD->height()-50 && !inspected.startsWith("Basket ");y+=14)
             for (int x=20;x<threeD->width()-20 && !inspected.startsWith("Basket ");x+=14) {
                 QMouseEvent press(QEvent::MouseButtonPress,QPointF(x,y),Qt::LeftButton,Qt::LeftButton,Qt::NoModifier);

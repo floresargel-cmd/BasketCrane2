@@ -733,6 +733,23 @@ QString posClass::displayBasketDetails() const {
     return QString("Basket %1 | Position %2.%3 | %4%5\n%6").arg(basketNum).arg(posNumber).arg(posIndex)
         .arg(displayDestination()).arg(isLocked?" | LOCKED":"").arg(rows.isEmpty()?QString("Empty basket"):rows.join("; "));
 }
+QString posClass::displayHoverDetails() const {
+    QStringList lines;
+    lines << description << QString("Position: %1.%2").arg(posNumber).arg(posIndex)
+        << QString("Basket: %1 | Destination: %2%3").arg(basketNum).arg(displayDestination()).arg(isLocked?" | LOCKED":"");
+    foreach (const QVector<QVariant>& row,contentsVV) {
+        if (row.size()<4) continue;
+        lines << QString("\nProfile %1\nPieces: %2 | Length: %3 mm%4")
+            .arg(row[1].toString().trimmed()).arg(row[2].toInt()).arg(row[3].toInt())
+            .arg(row.size()>4?QString(" | Temper: %1").arg(row[4].toString().trimmed()):QString());
+        if (row.size()>5) lines << "Current finish code: " + row[5].toString().trimmed();
+        if (row.size()>6) lines << "Standard practice: " + row[6].toString().trimmed();
+        if (row.size()>7) lines << "Customer: " + row[7].toString().trimmed();
+        if (row.size()>8) lines << "Next department: " + row[8].toString().trimmed();
+    }
+    if (contentsVV.isEmpty()) lines << "Empty basket";
+    return lines.join("\n");
+}
 
 QStringList posClass::displayBasketRows() const {
     QStringList rows;
