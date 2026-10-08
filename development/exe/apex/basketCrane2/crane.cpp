@@ -26,8 +26,9 @@ craneClass::craneClass(tuxipServerClass *tuxipServer,tuxipClass *tuxipConnection
 	carriage->loadFromDatabase();
 
 	QColor craneColor=QColor(150,150,175);
-	craneXItem=new gItemClass(":dxfs/craneX.dxf",QPen(QColor(200,225,200)),false,false,QColor(),this);  layoutScene->addItem(craneXItem);craneXItem->setZValue(-1);
-	craneYItem=new gItemClass(":dxfs/craneY.dxf",QPen(QColor(150,150,175)),false,false,QColor(),this);  layoutScene->addItem(craneYItem);craneYItem->setZValue(-1);
+	// Draw the beam and carriage above baskets without blocking position clicks.
+	craneXItem=new gItemClass(":dxfs/craneX.dxf",QPen(QColor(200,225,200)),false,false,QColor(),this);  layoutScene->addItem(craneXItem);craneXItem->setZValue(20);craneXItem->setAcceptedMouseButtons(Qt::NoButton);
+	craneYItem=new gItemClass(":dxfs/craneY.dxf",QPen(QColor(150,150,175)),false,false,QColor(),this);  layoutScene->addItem(craneYItem);craneYItem->setZValue(21);craneYItem->setAcceptedMouseButtons(Qt::NoButton);
 	craneWidget=new craneWidgetClass(tuxipServer,tuxip,carriage->getCarriageWidget(),this);
 	craneWidget->setCarriageClass(carriage);
 	//

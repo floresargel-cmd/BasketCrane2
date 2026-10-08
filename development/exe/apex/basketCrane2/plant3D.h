@@ -102,6 +102,9 @@ protected:
         box(QRectF(ground.left(),railBottom-180,ground.width(),180),2700,2900,QColor("#475569"),0);
         foreach (double x,QVector<double>()<<ground.left()<<ground.right()-180)
             foreach (double y,QVector<double>()<<railTop<<railBottom-180) box(QRectF(x,y,180,180),0,2700,QColor("#334155"),0);
+        // Long crane faces cannot share the equipment depth sort: their average
+        // depth lets individual station faces cover sections of the beam.
+        const int craneFaceStart=faces.size();
         box(QRectF(cx-160,railTop,320,ground.height()),2900,3200,craneColor,0);
         box(QRectF(cx-360,cy-480,720,960),3200,3500,craneColor.lighter(125),0);
         // Z is drawn in the same mm coordinate sense as the application, with a
@@ -111,12 +114,18 @@ protected:
         box(QRectF(cx-550,cy-250,1100,500),lift,lift+120,craneColor,scene.carriedBasket>0?-2:0,
             scene.carriedBasket>0?QString::number(scene.carriedBasket):QString());
         if (scene.carriedBasket>0) box(QRectF(cx-650,cy-320,1300,640),qMax(10.0,lift-550),lift,QColor("#38bdf8"),-2,QString::number(scene.carriedBasket),selectedKey==-2);
-        std::sort(faces.begin(),faces.end(),[](const Face& a,const Face& b){return a.depth<b.depth;});
-        foreach (const Face& face,faces) {
-            painter.setPen(QPen(face.selected?QColor("#ffffff"):face.color.lighter(125),face.selected?2:0.8));
-            painter.setBrush(face.color); painter.drawPolygon(face.polygon);
-            { QPainterPath path; path.addPolygon(face.polygon); hits<<Hit{path,face.key}; }
-        }
+        QVector<Face> craneFaces=faces.mid(craneFaceStart);
+        faces.resize(craneFaceStart);
+        const auto drawFaces=[&](QVector<Face>& layer) {
+            std::sort(layer.begin(),layer.end(),[](const Face& a,const Face& b){return a.depth<b.depth;});
+            foreach (const Face& face,layer) {
+                painter.setPen(QPen(face.selected?QColor("#ffffff"):face.color.lighter(125),face.selected?2:0.8));
+                painter.setBrush(face.color); painter.drawPolygon(face.polygon);
+                // Decorative crane geometry must not block basket inspection.
+                if (face.key!=0) { QPainterPath path; path.addPolygon(face.polygon); hits<<Hit{path,face.key}; }
+            }
+        };
+        drawFaces(faces);
         // Keep contents readable in screen space while camera/model geometry moves.
         QFont labelFont=painter.font(); labelFont.setPixelSize(11); painter.setFont(labelFont);
         foreach (const Plant3DSlot& slot,scene.positions3D) {
@@ -126,6 +135,8 @@ protected:
                 ((slot.destination=="HCA" || slot.destination=="P")?QColor("#22d3ee"):QColor("#fbbf24"))));
             drawDetailCard(painter,slot.footprint.adjusted(80,80,-80,-80),450,slot.key,QString("%1:%2%3").arg(slot.basket).arg(slot.destination).arg(slot.locked?" LOCKED":""),slot.rows,border);
         }
+        // Keep the complete moving crane above station geometry and cards.
+        drawFaces(craneFaces);
         if (scene.carriedBasket>0) drawDetailCard(painter,QRectF(cx-650,cy-320,1300,640),lift,-2,
             QString("%1  /  %2  Crane").arg(scene.carriedBasket).arg(scene.carriedDestination),scene.carriedRows,QColor("#38bdf8"));
         // Draw mission arrows last so equipment cannot hide them. Empty stations

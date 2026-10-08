@@ -256,7 +256,8 @@ inline bool basketUiPreview(const QString& file, const QString& mode) {
         slot.details=QString("Basket %1 | Position %2 | Profile 2109: %3 pieces, 7000 mm").arg(slot.basket).arg(slot.key).arg(i+25);
         sample.positions3D<<slot;
     }
-    sample.crane=QVector3D(13500,6000,700); sample.telemetryValid=true; sample.telemetryTime=QDateTime::currentMSecsSinceEpoch(); sample.carriedBasket=94; sample.carriedRows<<"6072:21:None"; sample.carriedDestination="None";
+    // Cross station footprints so previews reveal equipment covering the beam.
+    sample.crane=QVector3D(12300,6000,700); sample.telemetryValid=true; sample.telemetryTime=QDateTime::currentMSecsSinceEpoch(); sample.carriedBasket=94; sample.carriedRows<<"6072:21:None"; sample.carriedDestination="None";
     Plant3DView *threeD=installPlant3DView(map,[sample](){return sample;});
     if (!threeD || threeD->visibleBasketCount()!=12) return false;
     if (!window.findChildren<QTabWidget*>().isEmpty() || !map->isHidden()) { std::fprintf(stderr,"Preview: tabs/map visibility failed\n"); return false; }
