@@ -86,6 +86,12 @@ public:
     QString displayBasketDetails() const;
     QString displayHoverDetails() const;
     QString displayDestination() const;
+    void setDisplayExportQueues(const QStringList& tables);
+    QString displayExportCodes() const;
+    QString displayExportTitles() const;
+private:
+    QStringList displayExportQueueTables;
+public:
     QStringList displayBasketRows() const;
     bool displayIsTarget() const { return isTo; }
     QList<QPolygonF> displaySourcePaths() const { return fromItem->mapToScene(fromItem->displayPath()).toSubpathPolygons(); }

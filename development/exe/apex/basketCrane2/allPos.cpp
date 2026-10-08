@@ -1,5 +1,6 @@
 #include "exportQueues.h"
 #include "allPos.h"
+#include "exportQueueDisplay.h"
 #include "observerDisplay.h"
 
 //#define notAllPos
@@ -153,6 +154,7 @@ void allPossClass::loadFromDatabase()
         : execTableQuery(QString("select basketnum,dienum,Pc,PcLen,temper from basket_details where Pc<>0"),aDb);
 	for (int i=0;i<posV.count();i++)
 		posV[i]->loadFromAllData(allPosVV,allContentsVV);
+    exportListChangedSlot();
 }
 QVector<posClass*> allPossClass::getPositionsOfColumn(int col)
 {
@@ -455,11 +457,12 @@ void allPossClass::addBasketToExports(int basket,QString table)
 }
 void allPossClass::exportListChangedSlot()
 {
-    QVector<QVariant> baskets;
-    foreach (const BasketExportQueue& queue,basketExportQueues())
-        baskets += basketExecQuery(QString("select basket from %1 order by priority asc").arg(queue.table),bDb);
-    for (int i=0;i<posV.count();i++)
-        posV[i]->setIsOnExportList(baskets.contains(posV[i]->getBasketNumber()));
+    const auto assignments=readBasketExportAssignments(bDb);
+    for (int i=0;i<posV.count();i++) {
+        const QStringList tables=assignments.value(posV[i]->getBasketNumber());
+        posV[i]->setIsOnExportList(!tables.isEmpty());
+        posV[i]->setDisplayExportQueues(tables);
+    }
 }
 
 void allPossClass::userChangedBasketSlot(posClass *pos)

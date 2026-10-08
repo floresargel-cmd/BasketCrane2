@@ -12,7 +12,7 @@ struct Plant3DSlot {
     QPointF pickupAnchor;
     bool hasPickupAnchor=false;
     int key=0, basket=0;
-    QString destination, details, hoverDetails;
+    QString destination, details, hoverDetails, exportCodes;
     QStringList rows;
     QList<QPolygonF> sourcePaths, targetPaths;
     bool locked=false, source=false, target=false;
@@ -174,7 +174,7 @@ protected:
             
             const QColor border=slot.locked?QColor("#f87171"):(slot.source?QColor("#f472b6"):(slot.target?QColor("#38bdf8"):
                 ((slot.destination=="HCA" || slot.destination=="P")?QColor("#22d3ee"):QColor("#fbbf24"))));
-            drawDetailCard(painter,slot.footprint.adjusted(80,80,-80,-80),450,slot.key,QString("%1:%2%3").arg(slot.basket).arg(slot.destination).arg(slot.locked?" LOCKED":""),slot.rows,border);
+            drawDetailCard(painter,slot.footprint.adjusted(80,80,-80,-80),450,slot.key,QString("%1:%2%3%4").arg(slot.basket).arg(slot.destination).arg(slot.exportCodes.isEmpty()?QString():":"+slot.exportCodes).arg(slot.locked?" LOCKED":""),slot.rows,border);
         }
         // Keep the complete moving crane above station geometry and cards.
         drawFaces(craneFaces);

@@ -1,6 +1,6 @@
 #include "automaticMissions.h"
-#include "exportQueues.h"
 #include "pos.h"
+#include "exportQueues.h"
 #include "allPos.h"
 #include "observerDisplay.h"
 #include "plantAppearance.h"
@@ -166,9 +166,10 @@ void posClass::updateTxt()
     }
     if (rows.isEmpty()) rows << "Empty basket";
     card->setBasket(basketNum,destinationText,rows,isLocked,isFrom,isTo);
+    card->setExportCodes(displayExportCodes());
     card->setVisible(basketNum>0 && displayMode!=displayNone);
-    card->setToolTip(QString("Basket %1 | %2\nDestination: %3%4\n%5").arg(basketNum).arg(description).arg(destinationText)
-        .arg(isLocked?" | LOCKED":QString()).arg(rows.join("\n")));
+    card->setToolTip(displayHoverDetails());
+    posItem->setToolTip(displayHoverDetails());
 }
 void posClass::setBasketId(int b,bool user,QString logInfo,int doNotCheckPosition,int doNotCheckIndex)
 {
@@ -312,6 +313,7 @@ void posClass::updateFromData(QVector<QVector<QVariant>> posVV,QVector<QVector<Q
 		if (basketNum!=b)
 		{
 			basketNum=b;
+            displayExportQueueTables.clear();
 			basketWithContents=contentsVV.count()>0?true:false;
 		}
 		description=posVV[0][2].toString().trimmed();
@@ -720,6 +722,20 @@ QVector<posClass*> posClass::getPosThatPreventYouToMove()
 	return ans;
 }
 
+void posClass::setDisplayExportQueues(const QStringList& tables) {
+    bool unchanged=displayExportQueueTables.size()==tables.size();
+    for (int i=0;unchanged && i<tables.size();++i) unchanged=displayExportQueueTables.at(i)==tables.at(i);
+    if (unchanged) return;
+    displayExportQueueTables=tables;
+    updateTxt();
+}
+QString posClass::displayExportCodes() const {
+    return basketExportAssignmentText(displayExportQueueTables,true);
+}
+QString posClass::displayExportTitles() const {
+    const QString titles=basketExportAssignmentText(displayExportQueueTables,false);
+    return titles.isEmpty()?QString("None"):titles;
+}
 QString posClass::displayDestination() const {
     if (basketCraneConfig().observer()) return contentsVV.isEmpty()?"None":observerDestination(contentsVV.last());
     return destination==destinationDestacker?"D":(destination==destinationPacking?"P":"None");
@@ -731,12 +747,13 @@ QString posClass::displayBasketDetails() const {
         rows << QString("Profile %1: %2 pieces, %3 mm").arg(row[1].toString().trimmed()).arg(row[2].toInt()).arg(row[3].toInt());
     }
     return QString("Basket %1 | Position %2.%3 | %4%5\n%6").arg(basketNum).arg(posNumber).arg(posIndex)
-        .arg(displayDestination()).arg(isLocked?" | LOCKED":"").arg(rows.isEmpty()?QString("Empty basket"):rows.join("; "));
+        .arg(displayDestination()).arg(isLocked?" | LOCKED":"").arg(rows.isEmpty()?QString("Empty basket"):rows.join("; "))+"\nExport queue: "+displayExportTitles();
 }
 QString posClass::displayHoverDetails() const {
     QStringList lines;
     lines << description << QString("Position: %1.%2").arg(posNumber).arg(posIndex)
         << QString("Basket: %1 | Destination: %2%3").arg(basketNum).arg(displayDestination()).arg(isLocked?" | LOCKED":"");
+    lines << "Export queue: " + displayExportTitles();
     foreach (const QVector<QVariant>& row,contentsVV) {
         if (row.size()<4) continue;
         lines << QString("\nProfile %1\nPieces: %2 | Length: %3 mm%4")

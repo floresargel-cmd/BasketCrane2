@@ -20,7 +20,7 @@ inline QPen plantDrawingPen(QPen pen) {
 // This item accepts no input, preserving the existing machine hit targets.
 class PlantBasketCard : public QGraphicsItem {
     QRectF bounds;
-    QString title, destination;
+    QString title, destination, exportCodes;
     QStringList contents;
     bool locked=false, source=false, target=false, hovered=false;
 public:
@@ -28,6 +28,7 @@ public:
         setAcceptedMouseButtons(Qt::NoButton); setAcceptHoverEvents(false); setZValue(10);
     }
     QRectF boundingRect() const override { return bounds; }
+    void setExportCodes(const QString& codes) { exportCodes=codes; update(); }
     void setHovered(bool value) { hovered=value; update(); }
     void setBasket(int number, const QString& dest, const QStringList& rows, bool isLocked, bool from, bool to) {
         title=QString("#%1").arg(number); destination=dest; contents=rows;
@@ -46,7 +47,7 @@ public:
         painter->setClipRect(deviceRect.adjusted(4,3,-4,-3));
         QFont font("Segoe UI"); font.setPixelSize(deviceRect.width()>100?13:11); font.setBold(true); painter->setFont(font);
         const QRectF textRect=deviceRect.adjusted(6,3,-6,-3);
-        const QString caption=title+(locked?" LOCK":((destination.isEmpty() || destination=="None")?QString():"  "+destination));
+        const QString caption=title+((destination.isEmpty() || destination=="None")?QString():"  "+destination)+(exportCodes.isEmpty()?QString():":"+exportCodes)+(locked?" LOCK":"");
         painter->setPen(QColor("#f8fafc"));
         painter->drawText(textRect,Qt::AlignTop|Qt::AlignLeft,QFontMetrics(font).elidedText(caption,Qt::ElideRight,int(textRect.width())));
         font.setBold(false); font.setPixelSize(deviceRect.width()>100?12:10); painter->setFont(font); painter->setPen(QColor("#cbd5e1"));

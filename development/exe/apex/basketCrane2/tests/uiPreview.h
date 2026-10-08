@@ -5,6 +5,7 @@
 #include "../automaticMissions.h"
 #include "../gItem.h"
 #include "../exportQueues.h"
+#include "../exportQueueDisplay.h"
 #include "../expWdg.h"
 #include "../plant3D.h"
 #include "../carriageW.h"
@@ -103,6 +104,16 @@ inline bool basketUiPreview(const QString& file, const QString& mode) {
     }
     BasketPreviewQueueDriver *fixtureDriver = new BasketPreviewQueueDriver;
     QSqlDatabase::addDatabase(fixtureDriver,bDb);
+    const auto exportAssignments=readBasketExportAssignments(bDb);
+    if (exportAssignments.size()!=3
+        || basketExportAssignmentText(exportAssignments.value(52),true)!="B"
+        || basketExportAssignmentText(exportAssignments.value(93),true)!="P2"
+        || basketExportAssignmentText(exportAssignments.value(8),false)!="Packing Destacker A2"
+        || !exportAssignments.value(24).isEmpty()) return false;
+    QStringList allQueues;
+    foreach (const BasketExportQueue& queue,basketExportQueues()) allQueues << queue.table;
+    if (basketExportAssignmentText(allQueues,true)!="B,A,P1,P2") return false;
+    std::puts("PASS: basket export queue codes B/A/P1/P2 come from queue membership, including empty assignments.");
     fixtureDriver->historyMessage="Move basket from 1111 to 1300";
     const auto legacyHistory=readCraneControllerHistory(100);
     if (legacyHistory.size()!=1 || legacyHistory[0][0].toString()!="Move basket #52 from 1111 to 1300") return false;
@@ -280,7 +291,9 @@ inline bool basketUiPreview(const QString& file, const QString& mode) {
             else slot.targetPaths=transform.map(path).toSubpathPolygons();
         }
         slot.details=QString("Basket %1 | Position %2 | Profile 2109: %3 pieces, 7000 mm").arg(slot.basket).arg(slot.key).arg(i+25);
-        slot.hoverDetails=slot.details+"\nTemper: T5\nCustomer: Sample customer";
+        const QStringList tables=QStringList()<<basketExportQueues()[i%4].table;
+        slot.exportCodes=slot.basket>0?basketExportAssignmentText(tables,true):QString();
+        slot.hoverDetails=slot.details+"\nTemper: T5\nCustomer: Sample customer\nExport queue: "+basketExportAssignmentText(tables,false);
         sample.positions3D<<slot;
     }
     // Cross station footprints so previews reveal equipment covering the beam.
@@ -326,7 +339,7 @@ inline bool basketUiPreview(const QString& file, const QString& mode) {
                 QApplication::sendEvent(threeD,&hover);
                 const QString hoverText=QToolTip::text().replace(QChar(0x00a0),QChar(' '));
                 hovered=hoverText.contains("Profile 2109:") && hoverText.contains("Temper: T5")
-                    && hoverText.contains("Customer: Sample customer");
+                    && hoverText.contains("Customer: Sample customer") && hoverText.contains("Export queue:");
             }
         if (!hovered || inspected.startsWith("Basket ") || inspected.startsWith("Crane basket:")) {
             std::fprintf(stderr,"Preview: hover details without clicking failed: hovered=%d, selected=%s, tooltip=%s\n",

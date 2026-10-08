@@ -217,6 +217,7 @@
     <ClInclude Include="..\modernUi.h" />
     <ClInclude Include="..\plant3D.h" />
     <ClInclude Include="..\exportQueues.h" />
+    <ClInclude Include="..\exportQueueDisplay.h" />
     <ClInclude Include="..\plantAppearance.h" />
     <ClInclude Include="..\crane1Theme.h" />
     <ClInclude Include="..\tests\uiPreview.h" />
