@@ -53,15 +53,16 @@ if ($metadata.ProductVersion -ne $version -or $metadata.FileVersion -ne $version
 & (Join-Path $projectRoot 'tests\configurationMigration.ps1')
 & (Join-Path $projectRoot 'tests\nativeTransport.ps1') -Executable $executable
 $testConfiguration = Join-Path $releaseDir 'basketCrane2.ini'
-if (!(Test-Path -LiteralPath $testConfiguration)) {
-    Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'basketCrane2.template.ini') -Destination $testConfiguration
-}
+# The application build seeds this isolated output with the local site's INI.
+# Always stage the shipped template for offline checks, including default-path lookup.
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'basketCrane2.template.ini') -Destination $testConfiguration -Force
 & (Join-Path $projectRoot 'tests\configuration.ps1') -Executable $executable
 Copy-Item -LiteralPath $executable -Destination $payloadDir
 foreach ($file in @('CONFIGURATION.txt','ARCHITECTURE.txt','version.h')) {
     Copy-Item -LiteralPath (Join-Path $projectRoot $file) -Destination $payloadDir
 }
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'README.txt') -Destination (Join-Path $payloadDir 'INSTALLATION.txt')
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'TaskbarLayout.xml') -Destination $payloadDir
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'Migrate-Configuration.ps1') -Destination $payloadDir
 $vlcDir = [IO.Path]::GetFullPath((Join-Path $projectRoot '..\..\..\libs\_deploy\builds\vlc\vlc-2.2.1'))
 foreach ($file in @('libvlc.dll','libvlccore.dll')) {

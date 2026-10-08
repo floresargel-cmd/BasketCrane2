@@ -11,7 +11,7 @@
     </Property>
     <Launch Condition="Installed OR SQLSERVERCLIENT" Message="Microsoft OLE DB Driver 19 for SQL Server (32-bit client) is required. Install it from Microsoft's SQL Server OLE DB driver download page, then run this installer again. No ODBC driver or DSN is required." />
     <Property Id="WIXUI_EXITDIALOGOPTIONALTEXT"
-              Value="Configure SQL Server endpoints, catalogs and credentials in C:\ProgramData\Apex\BasketCrane2\basketCrane2.ini before launching. No ODBC driver or DSN is required. The supplied template selects LiveObserver." />
+              Value="Configure C:\ProgramData\Apex\BasketCrane2\basketCrane2.ini before launching.&#10;&#10;Taskbar: right-click the desktop shortcut, choose Show more options if needed, then Pin to taskbar." />
     <ui:WixUI Id="WixUI_InstallDir" InstallDirectory="INSTALLFOLDER" />
     <!-- This internal deployment package adds no separate license agreement. -->
     <UI>
@@ -47,10 +47,18 @@
         </Component>
       </Directory>
     </StandardDirectory>
+    <StandardDirectory Id="DesktopFolder">
+      <Component Id="DesktopApplicationShortcut" Guid="{AE4186D2-2F71-4A47-99EE-CECB9A964F8C}">
+        <Shortcut Id="DesktopApplication" Name="Apex Basket Crane 2" Target="[#MainExecutable]"
+                  Arguments="--config &quot;[CONFIGFOLDER]basketCrane2.ini&quot;" WorkingDirectory="INSTALLFOLDER" Icon="AppIcon" />
+        <RegistryValue Root="HKLM" Key="Software\Apex\BasketCrane2" Name="DesktopShortcut" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </StandardDirectory>
     <Feature Id="Application" Title="Apex Basket Crane 2" Level="1">
       <ComponentRef Id="MainApplication" />
       <ComponentRef Id="SiteConfiguration" />
       <ComponentRef Id="ApplicationShortcuts" />
+      <ComponentRef Id="DesktopApplicationShortcut" />
       <ComponentGroupRef Id="RuntimePayload" />
     </Feature>
   </Package>

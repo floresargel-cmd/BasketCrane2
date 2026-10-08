@@ -3,5 +3,5 @@
 // Update with installer/Set-Version.ps1 so metadata stays synchronized.
 #define BASKET_VERSION_MAJOR 2
 #define BASKET_VERSION_MINOR 5
-#define BASKET_VERSION_PATCH 46
-#define BASKET_VERSION_STRING "2.5.46"
+#define BASKET_VERSION_PATCH 48
+#define BASKET_VERSION_STRING "2.5.48"

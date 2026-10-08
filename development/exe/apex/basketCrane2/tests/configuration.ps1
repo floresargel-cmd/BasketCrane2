@@ -1,8 +1,11 @@
 param(
     [Parameter(Mandatory=$true)][string]$Executable,
-    [string]$Ini = (Join-Path $PSScriptRoot '..\basketCrane2.ini')
+    [string]$Ini
 )
 $ErrorActionPreference = 'Stop'
+# Use the shipped placeholder template so packaging never depends on site settings.
+# Resolve the default after parameter binding for Windows PowerShell -File.
+if (!$Ini) { $Ini = Join-Path $PSScriptRoot '..\installer\basketCrane2.template.ini' }
 $Executable = (Resolve-Path -LiteralPath $Executable).Path
 $baseline = [regex]::Replace([IO.File]::ReadAllText((Resolve-Path -LiteralPath $Ini).Path), '(?m)^Mode=[^\r\n]*', 'Mode=Live')
 $testDir = Join-Path ([IO.Path]::GetTempPath()) ('basket-config-' + [Guid]::NewGuid())
@@ -36,7 +39,7 @@ try {
     Check 'LiveObserver permission policy' ($baseline.Replace('Mode=Live', 'Mode=LiveObserver')) 0 'Environment=LiveObserver; Database=read-only; PLC=read-only telemetry'
     Check 'missing environment cannot enable live control' ([regex]::Replace($baseline, '(?m)^Mode=Live\r?\n', '')) 1 'Missing configuration key: Environment/Mode'
     Check 'emulation flag cannot override policy' ($baseline + "`n[Plc]`nEmulate=false`n") 1 'Unknown configuration key'
-    Check 'production INI via explicit path' $baseline 0 'Configuration is valid.'
+    Check 'valid INI via explicit path' $baseline 0 'Configuration is valid.'
     Check 'legacy INI without email settings' ([regex]::Replace($baseline, '(?ms)^\[EmailAlerts\].*\z', '')) 0 'Configuration is valid.'
     Check 'invalid email configuration disables alerts without blocking HMI' ($baseline.Replace('SmtpPort=25', 'SmtpPort=invalid')) 0 'Email alerts disabled: invalid [EmailAlerts] settings:'
     Check 'default INI independent of working directory' $baseline 0 'Configuration is valid.' $true
@@ -49,14 +52,14 @@ try {
     Check 'unquoted SQL endpoint with port' ([regex]::Replace($baseline,'(?m)^Server=[^\r\n]*','Server=localhost,1433')) 0 'Configuration is valid.'
     Check 'quoted SQL endpoint with port' ([regex]::Replace($baseline,'(?m)^Server=[^\r\n]*','Server="localhost,1433"')) 0 'Configuration is valid.'
     Check 'empty password' ([regex]::Replace($baseline, '(?m)^Password=[^\r\n]+', 'Password=')) 1 'must not be empty'
-    Check 'invalid IP' ($baseline.Replace('Crane2Ip=20.20.20.60', 'Crane2Ip=999.999.1.1')) 1 'Invalid PLC IP address'
+    Check 'invalid IP' ([regex]::Replace($baseline, '(?m)^Crane2Ip=[^\r\n]*', 'Crane2Ip=999.999.1.1')) 1 'Invalid PLC IP address'
     Check 'invalid environment' ($baseline.Replace('Mode=Live', 'Mode=Invalid')) 1 'must be Test, Live, or LiveObserver'
-    Check 'zero polling interval' ($baseline.Replace('PollIntervalMs=100', 'PollIntervalMs=0')) 1 'positive integer'
+    Check 'zero polling interval' ([regex]::Replace($baseline, '(?m)^PollIntervalMs=[^\r\n]*', 'PollIntervalMs=0')) 1 'positive integer'
     Check 'negative timer' ($baseline.Replace('MainMs=1000', 'MainMs=-1')) 1 'positive integer'
     Check 'integer overflow' ($baseline.Replace('RetainedRows=10000', 'RetainedRows=2147483648')) 1 'positive integer'
-    Check 'invalid catalog identifier' ($baseline.Replace('Catalog=Epics', 'Catalog=Epics];drop table x;--')) 1 'Invalid database catalog identifier'
+    Check 'invalid catalog identifier' ([regex]::Replace($baseline, '(?m)^Catalog=[^\r\n]*', 'Catalog=invalid];drop table x;--')) 1 'Invalid database catalog identifier'
     Check 'unknown key' ($baseline + "`nUnexpected=1`n") 1 'Unknown configuration key'
-    Check 'alternate deployment settings' ($baseline.Replace('Mode=Live', 'Mode=Test').Replace('MainMs=1000', 'MainMs=2000').Replace('Server=192.168.105.94\\SQLExpress', 'Server=local,1433')) 0 'Configuration is valid.'
+    Check 'alternate deployment settings' ([regex]::Replace($baseline.Replace('Mode=Live', 'Mode=Test').Replace('MainMs=1000', 'MainMs=2000'), '(?m)^Server=[^\r\n]*', 'Server=local,1433')) 0 'Configuration is valid.'
 } finally {
     # Remove only files created by these tests, using the verified directory.
     $resolvedTestDir = [IO.Path]::GetFullPath($testDir)

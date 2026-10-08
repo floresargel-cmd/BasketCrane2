@@ -60,9 +60,25 @@ Verify rollover behavior without changing the real version:
 Read MSI metadata and deployment policies without installing it:
   powershell -File tests\installer.ps1 -Msi <built-msi-path>
 The packaging script runs both checks and the offline application safety suite.
+Configuration regression checks use basketCrane2.template.ini by default, so
+local site settings do not affect packaging. To validate a site's configuration,
+use the application's --check-config --config command shown below.
 
 Install the MSI as an administrator. It installs the x86 application, embedded
-Qt application, VLC DLLs/plugins, configuration guide and Start Menu shortcuts.
+Qt application, VLC DLLs/plugins, configuration guide, Start Menu shortcuts and an all-users desktop shortcut.
+Desktop and Start Menu application shortcuts use the same ProgramData INI.
+For taskbar access, right-click the desktop shortcut, choose Show more options
+on Windows 11 if needed, then Pin to taskbar. The installer finish screen also
+shows these steps. Windows taskbar pinning requires user action or an IT policy;
+the installer does not silently pin the app.
+For automatic taskbar pins on managed PCs, the installed TaskbarLayout.xml
+references the all-users Start Menu shortcut with its ProgramData configuration.
+IT must deploy this XML through Intune StartLayout, a provisioning package,
+or the Start Layout Group Policy. Merge the app entry into an existing layout
+if your organization already manages pins. The XML appends the app and does
+not use PinListPlacement=Replace. Install the application before applying it.
+Policy settings can reapply pins and affect the Start layout; follow:
+https://learn.microsoft.com/windows/configuration/taskbar/pinned-apps
 No service or automatic application launch is configured. A stable UpgradeCode
 replaces older MSI releases and blocks downgrades. Upgrade removal participates
 in the installer transaction so a failed upgrade can restore the old product.

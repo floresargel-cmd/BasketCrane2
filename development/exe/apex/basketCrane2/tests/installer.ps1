@@ -37,6 +37,26 @@ $remove = $actions | Where-Object { $_[0] -eq 'RemoveExistingProducts' }
 $initialize = $actions | Where-Object { $_[0] -eq 'InstallInitialize' }
 if (!$remove -or !$initialize -or [int]$remove[1] -le [int]$initialize[1]) { throw 'Upgrade removal must participate in rollback.' }
 if (@(Get-MsiRows 'SELECT `UpgradeCode` FROM `Upgrade`' 1).Count -lt 2) { throw 'Upgrade and downgrade detection missing.' }
-$shortcuts = @(Get-MsiRows 'SELECT `Arguments` FROM `Shortcut`' 1)
-if (@($shortcuts | Where-Object { $_[0] -like '*[[]CONFIGFOLDER[]]basketCrane2.ini*' }).Count -ne 1) { throw 'Start Menu configuration path missing.' }
+$shortcuts = @(Get-MsiRows 'SELECT `Shortcut`, `Directory_`, `Target`, `Arguments`, `WkDir`, `Icon_` FROM `Shortcut`' 6)
+foreach ($expected in @(@('StartApplication','ApplicationMenu'), @('DesktopApplication','DesktopFolder'))) {
+    $shortcut = $shortcuts | Where-Object { $_[0] -eq $expected[0] }
+    if (!$shortcut -or $shortcut[1] -ne $expected[1] -or $shortcut[2] -ne '[#MainExecutable]' -or
+        $shortcut[3] -ne '--config "[CONFIGFOLDER]basketCrane2.ini"' -or
+        $shortcut[4] -ne 'INSTALLFOLDER' -or $shortcut[5] -ne 'AppIcon') {
+        throw "Application shortcut missing or invalid: $($expected[0])"
+    }
+}
+if (@(Get-MsiRows 'SELECT `Component_` FROM `FeatureComponents`' 1 | Where-Object { $_[0] -eq 'DesktopApplicationShortcut' }).Count -ne 1) {
+    throw 'Desktop shortcut component is not installed by the application feature.'
+}
+if ($properties['WIXUI_EXITDIALOGOPTIONALTEXT'] -notlike '*Pin to taskbar*') { throw 'Taskbar pinning instructions missing.' }
+if (@($files | Where-Object { $_[1] -match '(^|\|)TaskbarLayout\.xml$' }).Count -ne 1) { throw 'IT taskbar layout missing from installed payload.' }
+[xml]$taskbarLayout = [IO.File]::ReadAllText((Join-Path $PSScriptRoot '..\installer\TaskbarLayout.xml'))
+$taskbarNamespaces = [Xml.XmlNamespaceManager]::new($taskbarLayout.NameTable)
+$taskbarNamespaces.AddNamespace('taskbar','http://schemas.microsoft.com/Start/2014/TaskbarLayout')
+$taskbarPin = $taskbarLayout.SelectSingleNode('//taskbar:DesktopApp', $taskbarNamespaces)
+if (!$taskbarPin -or $taskbarPin.GetAttribute('DesktopApplicationLinkPath') -ne '%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Apex Basket Crane 2\Apex Basket Crane 2.lnk' -or
+    $taskbarLayout.SelectSingleNode('//*[@PinListPlacement="Replace"]')) {
+    throw 'Taskbar policy must append the installed all-users application shortcut.'
+}
 Write-Output "PASS: MSI $version metadata, upgrade identity, rollback sequence, persistent configuration, shortcuts and payload allowlist."

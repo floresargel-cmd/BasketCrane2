@@ -25,6 +25,7 @@
     <None Include="ApexBasketCrane2.Installer.proj" />
     <None Include="Build-Installer.ps1" />
     <None Include="Package.wxs" />
+    <None Include="TaskbarLayout.xml" />
     <None Include="Set-Version.ps1" />
     <None Include="Versioning.ps1" />
     <None Include="README.txt" />
