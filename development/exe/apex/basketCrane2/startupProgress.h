@@ -3,6 +3,7 @@
 #include <QFont>
 #include <QPointer>
 #include <QSplashScreen>
+#include "splashBranding.h"
 
 namespace basket {
 
@@ -10,7 +11,7 @@ namespace basket {
 // non-owning, automatically cleared observer while it is alive.
 class StartupProgress final {
 public:
-    StartupProgress() : splash_(QPixmap(":/splash.png"))
+    StartupProgress() : splash_(basketCraneSplashPixmap())
     {
         Active() = &splash_;
         splash_.setFont(QFont("Arial", 12));
