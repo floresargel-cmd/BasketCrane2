@@ -234,6 +234,32 @@ inline bool basketUiPreview(const QString& file, const QString& mode) {
     for (QCheckBox* control : automaticControls) if (control->isEnabled() != (mode == "Live")) return false;
     if (mode == "LiveObserver") { foreach (QPushButton *button, window.findChildren<QPushButton*>()) button->setEnabled(false); foreach (QRadioButton *button,window.findChildren<QRadioButton*>()) button->setEnabled(false); }
     Plant3DScene sample;
+    {
+        Plant3DScene contact;
+        Plant3DSlot source; source.source=true; source.hasPickupAnchor=true;
+        source.key=1; source.basket=52; source.destination="HCA"; source.rows<<"2109:30:HCA";
+        source.pickupAnchor=QPointF(3000,1200); source.footprint=QRectF(5000,1000,1800,1500);
+        Plant3DSlot target=source; target.source=false; target.target=true;
+        target.key=2; target.basket=0;
+        target.pickupAnchor=QPointF(9000,4000); target.footprint=QRectF(10000,5000,1800,1500);
+        contact.positions3D<<source<<target; contact.crane=QVector3D(3000,1200,2400);
+        contact.telemetryValid=true; contact.telemetryTime=QDateTime::currentMSecsSinceEpoch();
+        if (plantCraneFootprint(contact)!=source.footprint.adjusted(80,80,-80,-80) || plantCraneHookHeight(contact)!=450) return false;
+        {
+            Plant3DView pickup([contact]() { return contact; }); pickup.resize(1000,700); pickup.show(); QApplication::processEvents();
+            if (!pickup.grab().save(file+".pickup.png")) return false;
+        }
+        contact.carriedBasket=52; contact.crane=QVector3D(9000,4000,2400);
+        if (plantCraneFootprint(contact)!=target.footprint.adjusted(80,80,-80,-80) || plantCraneHookHeight(contact)-350!=100) return false;
+        {
+            contact.positions3D[0].basket=0; contact.carriedRows=source.rows; contact.carriedDestination=source.destination;
+            Plant3DView placement([contact]() { return contact; }); placement.resize(1000,700); placement.show(); QApplication::processEvents();
+            if (!placement.grab().save(file+".placement.png")) return false;
+        }
+        contact.crane=QVector3D(6500,2500,0);
+        if (plantCraneFootprint(contact).center()!=QPointF(6500,2500) || plantCraneHookHeight(contact)!=3200) return false;
+        std::puts("PASS: display-only pickup/drop-off align with slot offsets, basket rests on platform, and hooks rise at Z=0; travel coordinates stay unchanged.");
+    }
     gItemClass sourceDrawing(":dxfs/basketRectFrom.dxf",QPen(),false,false,QColor());
     gItemClass targetDrawing(":dxfs/basketRectTo.dxf",QPen(),false,false,QColor());
     if (sourceDrawing.displayPath().isEmpty() || targetDrawing.displayPath().isEmpty()) return false;

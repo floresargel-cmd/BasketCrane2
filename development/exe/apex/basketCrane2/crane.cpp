@@ -101,10 +101,17 @@ void craneClass::dataInPlcChanged(QString ip,QString table,int index,QVariant va
 			plcZ=value.toFloat();
 		if (index==6)
 			plcY=value.toFloat();
-		if ((index==0)||(index==1)||(index==6))
-		{
+		// Drawing telemetry follows the HMI's actual Z channel. Keep legacy
+		// carriage/control inputs unchanged; this only feeds the overview.
+		if (index==12) displayZ=value.toFloat();
+		if (index==13 && std::isfinite(value.toFloat()) && value.toFloat()>100)
+			displayLoweredZ=value.toFloat();
+		if ((index==0)||(index==6)||(index==12)) {
             displayAxes |= index==0?1:(index==6?2:4);
             displayAxisTimes[index==0?0:(index==6?1:2)]=QDateTime::currentMSecsSinceEpoch();
+		}
+		if ((index==0)||(index==1)||(index==6))
+		{
 			craneXItem->setPos(plcX,0.);
 			craneYItem->setPos(plcX,plcY);
 			carriage->setPlcPos(plcX,plcY,plcZ);

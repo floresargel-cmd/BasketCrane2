@@ -173,6 +173,7 @@ mainWindowClass::mainWindowClass():QMainWindow()
         Plant3DScene snapshot; snapshot.floorPaths=floorPaths;
         foreach (posClass *position,allPos->displayPositions()) {
             Plant3DSlot slot; slot.footprint=position->displayFootprint();
+            slot.pickupAnchor=QPointF(position->getPlcX(),position->getPlcY()); slot.hasPickupAnchor=true;
             slot.key=position->getPositionNumber()*100+position->getPositionIndex();
             slot.basket=position->getBasketNumber(); slot.destination=position->displayDestination();
             slot.details=position->displayBasketDetails(); slot.rows=position->displayBasketRows(); slot.locked=position->getIsLocked();
@@ -182,6 +183,7 @@ mainWindowClass::mainWindowClass():QMainWindow()
             snapshot.positions3D<<slot;
         }
         snapshot.crane=crane->displayCoordinates(); snapshot.telemetryValid=crane->displayTelemetryValid();
+        snapshot.loweredZ=crane->displayLoweringTarget();
         snapshot.telemetryTime=crane->displayTelemetryTime(); snapshot.carriedBasket=crane->getCarriage()->displayBasketNumber();
         snapshot.carriedRows=crane->getCarriage()->displayBasketRows(); snapshot.carriedDestination=crane->getCarriage()->displayDestination();
         return snapshot;

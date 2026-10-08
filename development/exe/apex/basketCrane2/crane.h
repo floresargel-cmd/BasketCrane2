@@ -59,6 +59,7 @@ class craneClass : public QWidget
 	float												plcZ;
 	int													autoMode;
     int displayAxes=0;
+    float displayZ=0, displayLoweredZ=2400;
     qint64 displayAxisTimes[3]={0,0,0};
 	Q_OBJECT								
 public:
@@ -76,7 +77,8 @@ public:
 	craneClass(tuxipServerClass *tuxipServer,tuxipClass *tuxipConnection,allPossClass *allPos_,QGraphicsScene *layoutScene_,QWidget *p=NULL);
 	~craneClass();
 	QWidget* getCraneWidget();
-    QVector3D displayCoordinates() const { return QVector3D(plcX,plcY,plcZ); }
+    QVector3D displayCoordinates() const { return QVector3D(plcX,plcY,displayZ); }
+    float displayLoweringTarget() const { return displayLoweredZ; }
     bool displayTelemetryValid() const { return displayAxes==7; }
     qint64 displayTelemetryTime() const { return qMin(displayAxisTimes[0],qMin(displayAxisTimes[1],displayAxisTimes[2])); }
 	void setStations();

@@ -9,6 +9,8 @@
 // Display-only snapshots: the renderer has no DB, PLC or mission-control API.
 struct Plant3DSlot {
     QRectF footprint;
+    QPointF pickupAnchor;
+    bool hasPickupAnchor=false;
     int key=0, basket=0;
     QString destination, details;
     QStringList rows;
@@ -19,12 +21,40 @@ struct Plant3DScene {
     QVector<Plant3DSlot> positions3D;
     QList<QPolygonF> floorPaths;
     QVector3D crane;
+    double loweredZ=2400;
     int carriedBasket=0;
     QStringList carriedRows;
     QString carriedDestination;
     bool telemetryValid=false;
     qint64 telemetryTime=0;
 };
+// Map PLC coordinates into the schematic only near an active mission endpoint.
+// The smooth offset reaches the exact slot center without jumping during travel.
+inline QRectF plantCraneFootprint(const Plant3DScene& scene) {
+    const QPointF raw(scene.crane.x(),scene.crane.y());
+    const Plant3DSlot* endpoint=nullptr;
+    double closest=1500.0*1500.0;
+    foreach (const Plant3DSlot& slot,scene.positions3D) {
+        if (!slot.hasPickupAnchor || (!slot.source && !slot.target) || slot.footprint.isEmpty()) continue;
+        const QPointF delta=raw-slot.pickupAnchor;
+        const double distance=delta.x()*delta.x()+delta.y()*delta.y();
+        if (distance<closest || (distance==closest && endpoint && (scene.carriedBasket>0?slot.target:slot.source))) {
+            closest=distance; endpoint=&slot;
+        }
+    }
+    if (!endpoint) return QRectF(raw.x()-650,raw.y()-320,1300,640);
+    const double proximity=1-std::sqrt(closest)/1500.0;
+    const double blend=proximity*proximity*(3-2*proximity);
+    const QPointF center=raw+(endpoint->footprint.center()-endpoint->pickupAnchor)*blend;
+    const QSizeF size=QSizeF(1300,640)+(endpoint->footprint.adjusted(80,80,-80,-80).size()-QSizeF(1300,640))*blend;
+    return QRectF(center-QPointF(size.width()/2,size.height()/2),size);
+}
+inline double plantCraneHookHeight(const Plant3DScene& scene) {
+    // Actual Z increases as the hooks lower. The most recent lowering target
+    // remains the visual reference while the PLC commands a return to Z=0.
+    const double fraction=qBound(0.0,double(scene.crane.z())/qMax(100.0,scene.loweredZ),1.0);
+    return 3200.0-fraction*(3200.0-450.0);
+}
 class Plant3DView : public QWidget {
 public:
     typedef std::function<Plant3DScene()> Provider;
@@ -95,8 +125,9 @@ protected:
         const bool valid=scene.telemetryValid && finite(scene.crane);
         const bool stale=valid && QDateTime::currentMSecsSinceEpoch()-scene.telemetryTime>5000;
         const QColor craneColor=!valid?QColor("#64748b"):(stale?QColor("#fbbf24"):QColor("#38bdf8"));
-        const double cx=valid?scene.crane.x():ground.center().x();
-        const double cy=valid?scene.crane.y():ground.center().y();
+        const QRectF carriedFootprint=valid?plantCraneFootprint(scene):QRectF(ground.center()-QPointF(650,320),QSizeF(1300,640));
+        const double cx=carriedFootprint.center().x();
+        const double cy=carriedFootprint.center().y();
         const double railTop=ground.top(),railBottom=ground.bottom();
         box(QRectF(ground.left(),railTop,ground.width(),180),2700,2900,QColor("#475569"),0);
         box(QRectF(ground.left(),railBottom-180,ground.width(),180),2700,2900,QColor("#475569"),0);
@@ -107,13 +138,11 @@ protected:
         const int craneFaceStart=faces.size();
         box(QRectF(cx-160,railTop,320,ground.height()),2900,3200,craneColor,0);
         box(QRectF(cx-360,cy-480,720,960),3200,3500,craneColor.lighter(125),0);
-        // Z is drawn in the same mm coordinate sense as the application, with a
-        // schematic 1 m baseline; gantry height is illustrative, not calibrated.
-        const double lift=valid?qBound(180.0,1000.0+double(scene.crane.z()),2700.0):1000.0;
+        const double lift=valid?plantCraneHookHeight(scene):1000.0;
         box(QRectF(cx-45,cy-45,90,90),lift,3200,QColor("#cbd5e1"),0);
-        box(QRectF(cx-550,cy-250,1100,500),lift,lift+120,craneColor,scene.carriedBasket>0?-2:0,
+        box(carriedFootprint.adjusted(100,80,-100,-80),lift,lift+120,craneColor,scene.carriedBasket>0?-2:0,
             scene.carriedBasket>0?QString::number(scene.carriedBasket):QString());
-        if (scene.carriedBasket>0) box(QRectF(cx-650,cy-320,1300,640),qMax(10.0,lift-550),lift,QColor("#38bdf8"),-2,QString::number(scene.carriedBasket),selectedKey==-2);
+        if (scene.carriedBasket>0) box(carriedFootprint,qMax(100.0,lift-350),lift,QColor("#38bdf8"),-2,QString::number(scene.carriedBasket),selectedKey==-2);
         QVector<Face> craneFaces=faces.mid(craneFaceStart);
         faces.resize(craneFaceStart);
         const auto drawFaces=[&](QVector<Face>& layer) {
@@ -137,7 +166,7 @@ protected:
         }
         // Keep the complete moving crane above station geometry and cards.
         drawFaces(craneFaces);
-        if (scene.carriedBasket>0) drawDetailCard(painter,QRectF(cx-650,cy-320,1300,640),lift,-2,
+        if (scene.carriedBasket>0) drawDetailCard(painter,carriedFootprint,lift,-2,
             QString("%1  /  %2  Crane").arg(scene.carriedBasket).arg(scene.carriedDestination),scene.carriedRows,QColor("#38bdf8"));
         // Draw mission arrows last so equipment cannot hide them. Empty stations
         // are mission endpoints too. Preserve the original DXF arrow orientation.
@@ -188,7 +217,7 @@ private:
             const QPointF c=footprint.center(); const double w=footprint.width()*0.2,h=footprint.height()*0.3,d=source?1:-1;
             QPolygonF arrow; arrow<<QPointF(c.x()-w/2,c.y()-d*h)<<QPointF(c.x()+w/2,c.y()-d*h)
                 <<QPointF(c.x()+w/2,c.y())<<QPointF(c.x()+w,c.y())<<QPointF(c.x(),c.y()+d*h)
-                <<QPointF(c.x()-w,c.y())<<QPointF(c.x()-w/2,c.y())<<arrow.first();
+                <<QPointF(c.x()-w,c.y())<<QPointF(c.x()-w/2,c.y())<<QPointF(c.x()-w/2,c.y()-d*h);
             outlines<<arrow;
         }
         QPainterPath path;
