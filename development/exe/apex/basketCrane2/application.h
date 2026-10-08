@@ -8,6 +8,7 @@
 #include <QSharedMemory>
 #include "tests/environmentSafety.h"
 #include "tests/uiPreview.h"
+#include "tests/operatorErrorTests.h"
 
 namespace basket {
 inline void messageOutPut(QtMsgType type, const QMessageLogContext &context, const QString &msg)
@@ -32,7 +33,7 @@ public:
         }
         QScopedPointer<QCoreApplication> app((checkOnly || checkSafety || checkDatabases || checkHistory)
             ? new QCoreApplication(argc, argv)
-            : new QApplication(argc, argv));
+            : new OperatorApplication(argc, argv));
         QCoreApplication::setApplicationName("BasketCrane2");
         QCoreApplication::setOrganizationName("Apex");
         QCoreApplication::setApplicationVersion(BASKET_VERSION_STRING);
@@ -46,9 +47,11 @@ public:
         parser.addOption(QCommandLineOption("check-safety", "Run offline environment safety regression tests"));
         parser.addOption(QCommandLineOption("check-databases", "Test direct SQL Server connections using SELECT only; no HMI or PLC connections"));
         parser.addOption(QCommandLineOption("check-history", "Read controller movement history with basket audit recovery; no HMI or PLC connections"));
+        parser.addOption(QCommandLineOption("check-errors", "Test operator error dialogs offline without plant connections"));
         QCommandLineOption previewOption("preview-ui", "Save an offline UI preview without plant connections", "png-path");
         parser.addOption(previewOption);
         parser.process(*app);
+        if (parser.isSet("check-errors")) return basketOperatorErrorTests() ? 0 : 1;
         if (checkSafety) return basketEnvironmentSafetyTests() && basketNativeSqlServerTests() ? 0 : 1;
         QString configError;
         if (!basketCraneConfig().load(parser.value(configOption), configError)) {
@@ -122,10 +125,26 @@ public:
         }
         EmailAlerts emailAlerts(basketCraneConfig().EmailSettings());
         qInstallMessageHandler(messageOutPut);
-        StartupProgress progress;
-        mainWindowClass window;
-        progress.Finish(window);
-        window.showMaximized();
+        QScopedPointer<mainWindowClass> window;
+        QScopedPointer<QMainWindow> startupErrorWindow;
+        try {
+            StartupProgress progress;
+            window.reset(new mainWindowClass);
+            progress.Finish(*window);
+            window->showMaximized();
+        } catch (const OperatorError& error) {
+            // Startup cannot continue with a partly constructed control window.
+            // Keep a usable error window open instead of terminating the process.
+            startupErrorWindow.reset(new QMainWindow);
+            startupErrorWindow->setWindowTitle("Basket Crane 2 - Startup needs attention");
+            QLabel* message=new QLabel("Basket Crane 2 could not finish starting.\n\n" +
+                operatorErrorExplanation(error.details) +
+                "\n\nMachine controls are unavailable. After IT resolves the problem, close this window and reopen the application.");
+            message->setWordWrap(true); message->setMargin(24);
+            startupErrorWindow->setCentralWidget(message);
+            startupErrorWindow->resize(620,300); startupErrorWindow->show();
+            showOperatorError(error,startupErrorWindow.data());
+        }
         return app->exec();
     }
 };

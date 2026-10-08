@@ -306,8 +306,11 @@ int allPossClass::moveBasket(posClass *from,posClass *to)
 {
 	if ((!from)||(!to))
 	{
-		log(QString("moveBasket from==%1 to==%2").arg(from->getPosIndexDisplayString()).arg(to->getPosIndexDisplayString()),errorStr);
-		uExit(errorStr,QString("moveBasket from==%1 to==%2").arg(from->getPosIndexDisplayString()).arg(to->getPosIndexDisplayString()));
+		const QString message=QString("moveBasket from==%1 to==%2")
+			.arg(from ? from->getPosIndexDisplayString() : "missing")
+			.arg(to ? to->getPosIndexDisplayString() : "missing");
+		log(message,errorStr);
+		uExit(errorStr,message);
 	}
 	int fromBasket=from->getBasketNumber();
 	int toBasket=to->getBasketNumber();
