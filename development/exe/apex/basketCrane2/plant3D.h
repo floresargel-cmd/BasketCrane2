@@ -88,16 +88,19 @@ protected:
         }
         return QWidget::event(event);
     }
-    void leaveEvent(QEvent* event) override { QToolTip::hideText(); QWidget::leaveEvent(event); }
-    void mousePressEvent(QMouseEvent *e) override { QToolTip::hideText(); start=last=e->pos(); dragged=false; }
+    void leaveEvent(QEvent* event) override { hoverActive=false; update(); QToolTip::hideText(); QWidget::leaveEvent(event); }
+    void hideEvent(QHideEvent* event) override { hoverActive=false; QWidget::hideEvent(event); }
+    void mousePressEvent(QMouseEvent *e) override { hoverActive=false; update(); QToolTip::hideText(); start=last=e->pos(); dragged=false; }
     void mouseMoveEvent(QMouseEvent *e) override {
         QPoint delta=e->pos()-last; last=e->pos();
+        hoverPosition=e->pos(); hoverActive=e->buttons()==Qt::NoButton; update();
         if (e->buttons()!=Qt::NoButton) QToolTip::hideText();
         if ((e->pos()-start).manhattanLength()>4) dragged=true;
         if (e->buttons()&Qt::RightButton || e->buttons()&Qt::MiddleButton) { pan+=delta; update(); }
         else if (e->buttons()&Qt::LeftButton) { yaw+=delta.x()*0.008; elevation=qBound(0.15,elevation+delta.y()*0.006,1.52); update(); }
     }
     void mouseReleaseEvent(QMouseEvent *e) override {
+        hoverPosition=e->pos(); hoverActive=rect().contains(e->pos()) && e->buttons()==Qt::NoButton; update();
         if (e->button()!=Qt::LeftButton || dragged) return;
         selectedKey=-1;
         for (int i=hits.size()-1;i>=0;--i) if (hits[i].path.contains(e->pos())) { selectedKey=hits[i].key?hits[i].key:-1; break; }
@@ -180,6 +183,15 @@ protected:
         drawFaces(craneFaces);
         if (scene.carriedBasket>0) drawDetailCard(painter,carriedFootprint,lift,-2,
             QString("%1  /  %2  Crane").arg(scene.carriedBasket).arg(scene.carriedDestination),scene.carriedRows,QColor("#38bdf8"));
+        // Resolve against this frame's geometry so camera and telemetry changes
+        // cannot leave an old basket highlighted. The last hit is drawn on top.
+        if (hoverActive) {
+            for (int i=hits.size()-1;i>=0;--i) {
+                if (!hits[i].path.contains(hoverPosition)) continue;
+                painter.fillPath(hits[i].path,QColor(255,100,100,150));
+                break;
+            }
+        }
         // Draw mission arrows last so equipment cannot hide them. Empty stations
         // are mission endpoints too. Preserve the original DXF arrow orientation.
         foreach (const Plant3DSlot& slot,scene.positions3D) {
@@ -226,6 +238,7 @@ private:
     }
     double yaw=0,elevation=1.20,zoom=1,scale=1; QPointF center,offset,pan; QPoint start,last;
     int selectedKey=-1; int detailCards=0,missionMarkers=0; bool dragged=false;
+    QPoint hoverPosition; bool hoverActive=false;
     static bool finite(const QVector3D& v) { return std::isfinite(v.x()) && std::isfinite(v.y()) && std::isfinite(v.z()); }
     static bool validRect(const QRectF& r) { return std::isfinite(r.x()) && std::isfinite(r.y()) && std::isfinite(r.width()) && std::isfinite(r.height()) && r.width()>160 && r.height()>160; }
     QPointF projectRaw(const QVector3D& v) const {
